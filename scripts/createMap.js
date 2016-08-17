@@ -11,7 +11,7 @@ function createMap(){
     map = new mapboxgl.Map({
         container: 'map-canvas',
         style: 'mapbox://styles/paasky/ciqrm5tfn0003cem6ez8q3tmz',
-        center: [-73.99, 40.73], // NYC
+        center: LngLat(PLAYERS.get(game_data.player_settings.id).getAircraft().position), // NYC
         zoom: 8,
         minZoom: 6,
         maxZoom: 10,

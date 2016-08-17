@@ -157,7 +157,7 @@ function getDistances(pos1, pos2, speed=false, tick_length){
 
 function hasRange(aircraft, destination, speed=false){
     var dist = getDistances(aircraft.position, destination, speed);
-    var range_km = Math.round(aircraft.fuel.amount / aircraft.fuel.consumption);
+    var range_km = getRangeKm(aircraft);
     var reply = {
         dist: dist,
         range_km: range_km
@@ -168,6 +168,10 @@ function hasRange(aircraft, destination, speed=false){
         reply.status = false;
     }
     return reply;
+}
+
+function getRangeKm(aircraft){
+    return Math.round(aircraft.fuel.amount / aircraft.fuel.consumption);;
 }
 
 // calculates the angle between two points

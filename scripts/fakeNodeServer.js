@@ -47,7 +47,7 @@ var server_data = {
         heading: { lat: 37.2073850, lng: -93.2901779 },
         log: true,
         speed: 360,
-        visibility: 200
+        visibility: 150
     }
 };
 getDB();

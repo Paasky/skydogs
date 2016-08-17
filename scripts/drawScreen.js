@@ -113,6 +113,7 @@ function drawAircrafts(){
     
     // create Fog of War
     updateFow();
+    updateRangeCircle();
     // if( player_settings.screen_settings.follow ){ map.setCenter(player_markers[player_settings.id].getPosition()); }
 }
 drawAircrafts();
@@ -157,30 +158,6 @@ function updateFow(){
         };
     }
 
-    // draw the circle inside the FoW
-    function drawCircle(point, radius, dir) {
-        var d2r = Math.PI / 180;   // degrees to radians 
-        var r2d = 180 / Math.PI;   // radians to degrees 
-        var earthsradius = 6378; // 3963 is the radius of the earth in miles
-
-        var points = 32; 
-
-        // find the raidus in lat/lon 
-        var rlat = (radius / earthsradius) * r2d; 
-        var rlng = rlat / Math.cos(point.lat * d2r); 
-
-
-        var extp = new Array();
-        var end=points+1;
-        for (var i=0; i < end; i++)  
-        { 
-            var theta = Math.PI * (i / (points/2)); 
-            ey = point.lng + (rlng * Math.cos(theta)); // center a + radius x * cos(theta) 
-            ex = point.lat + (rlat * Math.sin(theta)); // center b + radius y * sin(theta) 
-            extp.push([ey, ex]); 
-        } 
-        return extp;
-    }
 
     // create the FoW
     if(! player_settings.fogOfWar){
@@ -191,7 +168,7 @@ function updateFow(){
         player_settings.fogOfWar = true;
         
         map.addLayer({
-            'id': 'route',
+            'id': 'fow',
             'type': 'fill',
             'source': 'fow',
             'layout': {},
@@ -203,6 +180,85 @@ function updateFow(){
     } else {
         map.getSource('fow').setData(getFoW());
     }
+}
+
+function updateRangeCircle(){
+    if(! map._loaded) return false;
+    var player_settings = game_data.player_settings;
+    
+    function getRangeCircle(){
+        return {
+            "type": "Feature",
+            "properties": {'name':'Range'},
+            "geometry": {
+                "type": "LineString",
+                "coordinates": drawCircle(
+                    aircraft_markers.get(game_data.player_settings.id).marker.getLngLat(),
+                    getRangeKm(game_data.AIRCRAFTS.get(game_data.player_settings.id)),
+                    1
+                )
+           }
+        };
+        return {
+            'type': 'Feature',
+            'properties': {},
+            'geometry': {
+                'type': 'LineString',
+                'coordinates': []
+            }
+        };
+    }
+    
+    // create the rangeCircle
+    if(! player_settings.rangeCircle){
+        map.addSource('rangeCircle', {
+            'type': 'geojson',
+            'data': getRangeCircle()
+        });
+        player_settings.rangeCircle = true;
+        
+        map.addLayer({
+            'id': 'rangeCircle',
+            'type': 'line',
+            'source': 'rangeCircle',
+            'layout': {
+                "line-join": "round",
+                "line-cap": "round"
+            },
+            'paint': {
+                "line-color": "#eee",
+                "line-width": 5,
+                'line-opacity': 0.2,
+                'line-dasharray': [1, 4]
+            }
+        });
+    } else {
+        map.getSource('rangeCircle').setData(getRangeCircle());
+    }
+}
+
+// draw a circle
+function drawCircle(point, radius, dir) {
+    var points=64;
+    var d2r = Math.PI / 180;   // degrees to radians 
+    var r2d = 180 / Math.PI;   // radians to degrees 
+    var earthsradius = 6378; // 3963 is the radius of the earth in miles
+
+    // find the raidus in lat/lon 
+    var rlat = (radius / earthsradius) * r2d; 
+    var rlng = rlat / Math.cos(point.lat * d2r); 
+
+
+    var extp = [];
+    var end=points+1;
+    for (var i=0; i < end; i++)  
+    { 
+        var theta = Math.PI * (i / (points/2)); 
+        ey = point.lng + (rlng * Math.cos(theta)); // center a + radius x * cos(theta) 
+        ex = point.lat + (rlat * Math.sin(theta)); // center b + radius y * sin(theta) 
+        extp.push([ey, ex]); 
+    } 
+    return extp;
 }
 
 

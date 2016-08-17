@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <link rel="stylesheet" href="style.css">
+    </head>
+    <body>
+        <div id="app-container" class="loading full-size">
+            <div id="loading-message" class="full-size"><span>Loading <span id="loading-message-type">Libraries</span></span></div>
+            <div ng-app="skyDogs" ng-controller="Ctrl" class="full-size">
+                <div id="map-canvas" class="full-size"></div>
+                <div id="logger"></div>
+                <!--
+                First Name: <input type="text" ng-model="firstName"><br>
+                Last Name: <input type="text" ng-model="lastName"><br>
+                <br>
+                Full Name: {{firstName + " " + lastName}}
+                -->
+            </div>
+        </div>
+<!--        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script> -->
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+        <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.22.0/mapbox-gl.js'></script>
+        <script src='scripts/turf.min.js'></script>
+        <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.22.0/mapbox-gl.css' rel='stylesheet' />
+        <script src="scripts/common.js"></script>
+        <script src="scripts/objects.js"></script>
+        <script>$('#loading-message').css('opacity', 0.5);</script>
+        
+        <script>$('#loading-message-type').text('Fake Server');</script>
+        <script src="scripts/fakeDB.js"></script>
+        <script src="scripts/fakeNodeServer.js"></script>
+        
+        <script>$('#loading-message-type').text('Map');</script>
+        <script src="scripts/createMap.js"></script>
+        
+        <script>$('#loading-message-type').text('Script');</script>
+        <script src="scripts/drawScreen.js"></script>
+        <script src="scripts/gameScript.js"></script>
+        
+        <script>
+            $('#loading-message-type').text('ready!');
+            
+            // as the last act, remove the loading status
+            $('#loading-message').fadeOut();
+            $('#app-container.loading').removeClass('loading');
+        </script>
+
+    </body>
+</html>

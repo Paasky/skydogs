@@ -1,0 +1,22 @@
+common.js - Common calculating functions for server & frontend
+
+createMap.js - Draws the map, map bounds & cities
+
+drawScreen.js - draws the players & user FoW, updates the screen
+
+fakeDB.js - holds the raw test data & sets up server variables
+
+fakeNodeServer.js - server functionality
+
+gameScript.js - game functions & event handlers
+
+
+Events:
+cityArrive (city)
+cityClick (city)
+cityLeave (city)
+destinationSet ()
+game_dataUpdated ()
+log (text)
+playerClick (player)
+screenUpdate ()

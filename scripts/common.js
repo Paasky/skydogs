@@ -1,0 +1,197 @@
+// generic LatLng object
+function LngLat(obj) {
+    return [obj.lng, obj.lat];
+}
+
+function tick(aircrafts, tick_length){
+    var arrivedAircraft = [];
+    aircrafts.forEach(function(a){
+        var p = a.getPlayer();
+
+        // if the route is visible (aka it exists)
+        if(a.destination.type && a.destination.type != "none"){
+
+            // distance calculations
+            var dist = getDistances(a.position, a.destination, a.speed, tick_length);
+
+            // if the distance left to travel is larger than the distance the player will travel
+            if(dist.geo>dist.dist_per_tick){
+                var dist_travelled = getDistances(a.position, dist.new_pos);
+
+                // set position of player
+                a.position.lat=dist.new_pos.lat;
+                a.position.lng=dist.new_pos.lng;
+
+                a.fuel.amount -= a.fuel.consumption*dist_travelled.km;
+
+            // if the distance left to travel is same or smaller than the distance the player will travel
+            } else {
+                arrivedAircraft.push(a);
+                // set player position to the destination, hide the route path, and set info box to 0
+                a.position = a.destination;
+                a.destination.type="none";
+                a.destination.id="0";
+                p.sleep=server_data.game_settings.ai_sleep;
+            }
+        }
+    });
+    return arrivedAircraft;
+}
+
+function cloneObject(obj) {
+    return jQuery.extend(true, {}, obj);
+}
+
+function isOnline(p){
+    if(p.id == server_data.player_settings.id){
+        return true;
+    } else {
+        return false;
+    }
+}
+
+function log(text){
+    $(document).trigger('log', text);
+    console.log(text);
+    if(game_data.player_settings.log == true){
+        var nextLog = $('<p>'+text+'</p>');
+        $('#logger').append(nextLog);
+        nextLog.fadeOut(2000, function(){ nextLog.remove(); });
+    }
+}
+
+// calculates the optimal angle to intercept another player
+function getAngleOfAttack(pos_attacker, pos_defender,
+                          dest_defender, speed_attacker,
+                          speed_defender){
+    var angle_a = getAngle(pos_defender, dest_defender);
+    var side_z = getDistances(pos_attacker, pos_defender).geo;
+    
+    var math1 = -2 * side_z * Math.cos(angle_a);
+    var math2 = 2 * side_z * Math.sqrt(Math.cos(angle_a)^2 + speed_attacker^2 / speed_defender^2 -1);
+    var math3 = 2 * (speed_attacker^2 / speed_defender^2 -1);
+    var side_y =  (math1 + math2) / math3;
+    var side_x = speed_attacker / speed_defender * side_y;
+    var angle_b = Math.asin(speed_defender / speed_attacker * Math.sin(angle_a));
+    
+    var answer = {
+        defender_dist: side_y,
+        attacker_dist: side_x,
+        attacker_angle: angle_b,
+    };
+    return answer;
+}
+
+// calculates the distance between two points
+function getDistances(pos1, pos2, speed=false, tick_length){
+    //--------  Distance in Geo  --------
+    var dist_x = pos2.lng - pos1.lng;
+    var dist_y = pos2.lat - pos1.lat;
+    var dist_in_geo = Math.sqrt(dist_x*dist_x + dist_y*dist_y);
+    
+    //--------  Distance in Km  --------
+    function rad(x) {
+        return x * Math.PI / 180;
+    }	
+    var R = 6378137; // Earth? mean radius in meter
+    var dLat = rad(pos2.lat - pos1.lat);
+    var dLong = rad(pos2.lng - pos1.lng);
+    var a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+        Math.cos(rad(pos1.lat)) * Math.cos(rad(pos2.lat)) *
+        Math.sin(dLong / 2) * Math.sin(dLong / 2);
+
+    var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    var dist_in_km = R * c / 1000;
+    
+    
+    var result = {
+        geo: dist_in_geo,
+        km: dist_in_km,
+    };
+    
+    //--------  Distance in Time  --------
+    if(speed){
+
+        // distance player moves in one tick (aka screen update interval)
+        /*
+        
+        example:
+        speed         = 360   km/h
+        geo_per_kmh   =   0.1
+                      =  36   geo/h   ( *geo_per_kmh )
+                      =   6   geo/min ( /60 )
+                      =   0.1 geo/s   ( /60 )
+        tick_length   =   0.1 s       ( tick_length/1000 )
+        dist_per_tick =   0.01 geo
+        
+        */
+        var dist_per_tick = speed * game_data.game_settings.geo_per_kmh / 60 / 60 * ( tick_length / 1000 );
+        
+        var ticks = dist_in_geo / dist_per_tick;
+        var time = ticks * ( tick_length / 1000 );
+        var h = Math.floor(time / 3600);
+        var m = Math.floor((time-h*3600) / 60);
+        var s = Math.floor(time-h*3600-m*60);
+        
+        var time_str = h + ":";
+        if(m<10){ time_str = time_str + "0"; }
+        time_str = time_str + m +":";
+        if(s<10){ time_str = time_str + "0"; }
+        time_str = time_str + s;
+        
+        //--------  New Position  --------
+        var new_x = dist_per_tick * (dist_x / dist_in_geo) + pos1.lng;
+        var new_y = dist_per_tick * (dist_y / dist_in_geo) + pos1.lat;
+        var new_pos = {lat: new_y, lng: new_x};
+        
+        result.dist_per_tick = dist_per_tick;
+        result.new_pos = new_pos;
+        result.h = h;
+        result.m = m;
+        result.s = s;
+        result.time_str = time_str;
+        result.ticks = ticks;
+    }
+    return result;
+}
+
+function hasRange(aircraft, destination, speed=false){
+    var dist = getDistances(aircraft.position, destination, speed);
+    var range_km = Math.round(aircraft.fuel.amount / aircraft.fuel.consumption);
+    var reply = {
+        dist: dist,
+        range_km: range_km
+    }
+    if(dist.km <= range_km){
+        reply.status = true;
+    } else {
+        reply.status = false;
+    }
+    return reply;
+}
+
+// calculates the angle between two points
+function getAngle(from, to) {
+    var point1 = {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [from.lng, from.lat]
+        }
+    };
+    var point2 = {
+        "type": "Feature",
+        "geometry": {
+          "type": "Point",
+          "coordinates": [to.lng, to.lat]
+        }
+    };
+    return turf.bearing(point1, point2);
+}
+
+// get url of a flag
+function getFlagUrl(filename, type='flag', size=''){
+    if(size) size+='/';
+    var url = game_data.game_settings.img_path +'/'+ type +'/'+ size + filename;
+    return url;
+}

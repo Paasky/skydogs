@@ -201,7 +201,7 @@ function getFlagUrl(filename, type='flag', size=''){
 
 function debugSingleTick(){
     clearInterval(serverTicker);
-    clearTimeout(screenUpdate);
+    clearInterval(screenUpdate);
     server.tick();
-    onScreenUpdate(false);
+    onScreenUpdate();
 }

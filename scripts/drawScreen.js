@@ -150,10 +150,10 @@ function updateFow(){
         var coords = new Array();
         
         if(player_settings.id in aircraft_markers){
-            coords.push([game_settings.map_bounds.west, game_settings.map_bounds.south]);
-            coords.push([game_settings.map_bounds.west, game_settings.map_bounds.north]);
-            coords.push([game_settings.map_bounds.east, game_settings.map_bounds.north]);
-            coords.push([game_settings.map_bounds.east, game_settings.map_bounds.south]);
+            coords.push([game_settings.map_bounds.west-2, game_settings.map_bounds.south-2]);
+            coords.push([game_settings.map_bounds.west-2, game_settings.map_bounds.north+2]);
+            coords.push([game_settings.map_bounds.east+2, game_settings.map_bounds.north+2]);
+            coords.push([game_settings.map_bounds.east+2, game_settings.map_bounds.south-2]);
             $.merge(
                 coords,
                 drawCircle(
@@ -284,7 +284,7 @@ function drawCircle(point, radius, dir) {
 
 // update the city icon size for different zoom levels
 function updateAircraftIcons(){
-    var radius = Math.round(map.getZoom()/2*10);
+    var radius = Math.round(map.getZoom()/2*8);
     $('.aircraft_marker').css({
         'width': radius + 'px',
         'height': radius + 'px',
@@ -295,11 +295,9 @@ function updateAircraftIcons(){
 
 
 
-function onScreenUpdate(next_tick=true){
+function onScreenUpdate(){
     $(document).trigger('screenUpdate');
     tick(game_data.AIRCRAFTS, game_data.player_settings.tick_length);
     drawAircrafts();
-    if(next_tick) screenUpdate = setTimeout(onScreenUpdate, game_data.player_settings.tick_length);
 }
-var screenUpdate;
-onScreenUpdate();
+var screenUpdate = setInterval(onScreenUpdate, game_data.player_settings.tick_length);

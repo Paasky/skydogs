@@ -37,6 +37,7 @@ body {
 .marker {
     background-size: contain;
     cursor: pointer;
+    text-align: center;
 }
 .city_marker {
     z-index: 35;
@@ -71,4 +72,17 @@ body {
     }
     .aircraft_label {
         z-index: 40;
+        bottom: -2.5em;
     }
+        .inner_label {
+            color: #999;
+            font-size: 0.8em;
+        }
+        .inner_label:before {
+            content:'( ';
+            font-size: 0.8em;
+        }
+        .inner_label:after {
+            content:' )';
+            font-size: 0.8em;
+        }

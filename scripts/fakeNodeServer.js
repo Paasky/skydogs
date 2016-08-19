@@ -11,9 +11,9 @@ var server_data = {
         img_path: 'img',
         
         // geo_per_kmh: 0.1,
-        geo_per_kmh: 1,
+        geo_per_kmh: 0.5,
         ai_sleep: 10,
-        tick_length: 1000,
+        tick_length: 500,
         
         z_index: {
             border: 10,
@@ -82,13 +82,16 @@ var server = {
                         // select a random city
                         rand_id = citiesInRange[Math.floor(Math.random()*citiesInRange.length)];
                     } else {
-                        console.log('MERCHANTAI ------------ Everything is too far away! Fallback to closest city.');
+                        //console.log('MERCHANTAI ------------ Everything is too far away! Fallback to closest city.');
                     }
                     var city = CITIES.get(rand_id);
-                    console.log(p.name+' ('+p.id+') '+ 'heads for '+city.name);
+                    //console.log(p.name+' ('+p.id+') '+ 'heads for '+city.name);
                     a.destination = cloneObject(city.position);
                     a.destination.type = "city";
                     a.destination.id = rand_id;
+                    if(game_data.AIRCRAFTS.get(a.id)){
+                        $(document).trigger('cityLeave', a.id);
+                    }
                 }
             }
         },
@@ -101,7 +104,9 @@ var server = {
         });
         arrivedAircraft.forEach(function(a){
             a.fuel.amount = a.fuel.max;
-            $(document).trigger('cityArrive', a);
+            if(game_data.AIRCRAFTS.get(a.id)){
+                $(document).trigger('cityArrive', a.id);
+            }
         });
     }
 };
@@ -175,6 +180,7 @@ function setUserDestination(type, id){
         aircraft.destination = new_dest;
         aircraft.destination.type = type;
         aircraft.destination.id = id;
+        $(document).trigger('cityLeave', aircraft.id);
         return 'up up and away!';
     } else {
         return 'Not enough range! Current range: '+range.range_km+' km, distance: '+Math.round(range.dist.km)+' km';

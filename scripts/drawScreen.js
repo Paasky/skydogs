@@ -83,14 +83,14 @@ function drawAircrafts(){
         } else {
             aircraft_markers.get(a_id).marker.setLngLat(LngLat(a_position));
         }
-        var angle = 0;
+        
         if(a_destination && a_destination.type != 'none'){
-            angle = getAngle(a_position, a_destination);
+            var angle = getAngle(a_position, a_destination);
+            angle -= map.getBearing();
+            $('.aircraft_marker[id="'+a_id+'"] .aircraft_image')
+            // .css('transform', 'rotate3d(1,0,0,'+map.getPitch()+'deg) rotate('+angle+'deg)');
+            .css('transform', 'rotate('+angle+'deg)');
         }
-        angle -= map.getBearing();
-        $('.aircraft_marker[id="'+a_id+'"] .aircraft_image')
-        // .css('transform', 'rotate3d(1,0,0,'+map.getPitch()+'deg) rotate('+angle+'deg)');
-        .css('transform', 'rotate('+angle+'deg)');
     });
         
         
@@ -162,8 +162,8 @@ function updateFow(){
                     1
                 )
             );
-            coords.push([game_settings.map_bounds.east, game_settings.map_bounds.south]);
-            coords.push([game_settings.map_bounds.west, game_settings.map_bounds.south]);
+            coords.push([game_settings.map_bounds.east+2, game_settings.map_bounds.south-2]);
+            coords.push([game_settings.map_bounds.west-2, game_settings.map_bounds.south-2]);
         }
         
         return {

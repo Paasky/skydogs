@@ -14,8 +14,8 @@ function createMap(){
         center: LngLat(PLAYERS.get(game_data.player_settings.id).getAircraft().position), // NYC
         zoom: 8,
         minZoom: 5,
-        maxZoom: 9,
-        pitch: 30
+        maxZoom: 8,
+        pitch: 45
     });
     map.setMaxBounds([
         [game_settings.map_bounds.west, game_settings.map_bounds.south],

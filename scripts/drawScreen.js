@@ -5,6 +5,8 @@ function drawAircrafts(){
     var game_settings = game_data.game_settings;
     var player_settings = game_data.player_settings;
     var aircrafts = game_data.AIRCRAFTS;
+    var on_zoom = 'on';
+    if(! game_data.player_settings.screen_settings.smooth_zoom) on_zoom = 'zoomend';
     
     function checkMarker(m){
         if(!m || ! aircrafts.get(m.id)){
@@ -129,7 +131,7 @@ function drawAircrafts(){
     */
     
     // update player icon size to different zoom levels
-    map.on('zoom', updateAircraftIcons);
+    map.on(on_zoom, updateAircraftIcons);
     updateAircraftIcons();
     
     // create Fog of War

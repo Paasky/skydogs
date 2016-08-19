@@ -2,7 +2,7 @@ var server_data = {
     game_settings: {
         map_bounds: {
             north: 61.5,
-            south: 22,
+            south: 20,
             east: -60,
             west: -161
         },
@@ -39,7 +39,8 @@ var server_data = {
             navbox: false,
             follow: false,
             search: false,
-            fullscreen: false
+            fullscreen: false,
+            smooth_zoom: false
         },
         tick_length: 100,
         mouse_position: {x:0, y:0},
@@ -70,7 +71,7 @@ var server = {
                     var closestCity = {dist: 9999999, id:0};
                     CITIES.forEach(function(city){
                         var range = hasRange(a, city.position);
-                        if(range.status) citiesInRange.push(city.id);
+                        if(range.status && range.dist.km > 10) citiesInRange.push(city.id);
                         if(range.dist.km < closestCity.dist){
                             closestCity.dist = range.dist.km;
                             closestCity.id = city.id;

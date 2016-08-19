@@ -45,17 +45,20 @@ function getDB(){
     
     
     // create player & aircraft data
+    var i = 0;
     players_raw.forEach(function(p){
+        //if(i>50) return;
+        i++;
         p.position = {
             lat: parseFloat(p.lat),
             lng: parseFloat(p.lng),
             id: p.location_id
         };
         p.destination = {
-            lat: parseFloat(p.end_lat),
-            lng: parseFloat(p.end_lng),
-            id: p.end_id,
-            type: p.end_type
+            lat: parseFloat(p.lat),
+            lng: parseFloat(p.lng),
+            id: p.location_id,
+            type: 'none'
         }
         p.fuel = {
             amount: 100,
@@ -64,7 +67,10 @@ function getDB(){
         };
         p.speed = 360;
         
-        PLAYERS.set( new Player(p.id, p.name, p.ai, Math.round(Math.random(500,1500)), p.id) );
+        PLAYERS.set( new Player(p.id, p.name, isAI(p.ai), Math.round(Math.random(500,1500)), p.id) );
         AIRCRAFTS.set( new Aircraft(p.id, p.name+"'s plane", p.fuel, p.speed, p.position, p.destination, p.id) );
     });
+    function isAI(ai){
+        if(ai=="1"){ return true } else { return false; }
+    }
 }

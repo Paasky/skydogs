@@ -79,8 +79,9 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
     this.speed = speed;
     this.position = position;
     this.destination = destination;
+    this.server = server;
     
-    this.getPlayer = function(){ if(server){ return PLAYERS.get(player_id); } else { return game_data.PLAYERS.get(player_id); } };
+    this.getPlayer = function(){ if(this.server){ return PLAYERS.get(player_id); } else { return game_data.PLAYERS.get(player_id); } };
 }
 
 var COUNTRIES = new ObjectHolder();
@@ -111,8 +112,9 @@ function Player(id, name, ai, money, aircraft_id, server=true) {
     this.name = name;
     this.ai = ai;
     this.money = money;
+    this.server = server;
     
-    this.getAircraft = function(){ if(server){ return AIRCRAFTS.get(aircraft_id); } else { return game_data.AIRCRAFTS.get(aircraft_id); } };
+    this.getAircraft = function(){ if(this.server){ return AIRCRAFTS.get(aircraft_id); } else { return game_data.AIRCRAFTS.get(aircraft_id); } };
     this.getPosition = function(){ return this.getAircraft().position };
     this.getDestination = function(){ return this.getAircraft().destination };
     this.getSpeed = function(){ return this.getAircraft().speed }

@@ -41,7 +41,7 @@ body {
 .city_marker {
     z-index: 35;
 }
-.player_marker {
+.aircraft_marker {
     z-index: 45;
 }
 .user_marker {
@@ -69,6 +69,6 @@ body {
     .city_label {
         z-index: 30;
     }
-    .player_label {
+    .aircraft_label {
         z-index: 40;
     }

@@ -11,8 +11,8 @@ var server_data = {
         img_path: 'img',
         
         // geo_per_kmh: 0.1,
-        geo_per_kmh: 0.1,
-        ai_sleep: 50,
+        geo_per_kmh: 1,
+        ai_sleep: 10,
         tick_length: 1000,
         
         z_index: {
@@ -47,7 +47,7 @@ var server_data = {
         heading: { lat: 37.2073850, lng: -93.2901779 },
         log: true,
         speed: 360,
-        visibility: 150
+        visibility: 200
     }
 };
 getDB();
@@ -58,29 +58,37 @@ var server = {
             var a = p.getAircraft();
             
             // if the player isn't going anywhere
-            if(a.destination.type=="none" && p.ai==1){
-
+            if(a.destination.type=="none" && p.ai){
                 // if the current player is sleeping in the city
                 if(p.sleep>0){
                     p.sleep--;
 
                 // if the player is active, do stuff
                 } else {
+                    
                     var citiesInRange = [];
+                    var closestCity = {dist: 9999999, id:0};
                     CITIES.forEach(function(city){
                         var range = hasRange(a, city.position);
-                        if(range.status) citiesInRange.push(city);
+                        if(range.status) citiesInRange.push(city.id);
+                        if(range.dist.km < closestCity.dist){
+                            closestCity.dist = range.dist.km;
+                            closestCity.id = city.id;
+                        }
                     });
                     
-                    // select a random city
-                    var keys = Object.keys(citiesInRange);
-                    var rand_id = keys[Math.floor(keys.length * Math.random())];
-                    
-                    p.destination = citiesInRange[rand_id].position;
-                    p.destination.type = "city";
-                    p.destination.id = rand_id;
-                    
-                    log('merchantAI: '+ p.name +' heads for '+ citiesInRange[rand_id].name)
+                    var rand_id = closestCity.id;
+                    if(citiesInRange.length > 0){
+                        // select a random city
+                        rand_id = citiesInRange[Math.floor(Math.random()*citiesInRange.length)];
+                    } else {
+                        console.log('MERCHANTAI ------------ Everything is too far away! Fallback to closest city.');
+                    }
+                    var city = CITIES.get(rand_id);
+                    console.log(p.name+' ('+p.id+') '+ 'heads for '+city.name);
+                    a.destination = cloneObject(city.position);
+                    a.destination.type = "city";
+                    a.destination.id = rand_id;
                 }
             }
         },
@@ -88,6 +96,9 @@ var server = {
     tick: function(){
         var arrivedAircraft = tick(AIRCRAFTS, server_data.game_settings.tick_length);
         updateGameData();
+        PLAYERS.forEach(function(p){
+            server.ai.merchantAI(p);
+        });
         arrivedAircraft.forEach(function(a){
             a.fuel.amount = a.fuel.max;
             $(document).trigger('cityArrive', a);
@@ -116,8 +127,8 @@ var game_data = {
 function updateGameData(){
     var player = PLAYERS.get(server_data.player_settings.id);
     var aircraft = player.getAircraft();
-    var aircrafts = new ObjectHolder();
-    var players = new ObjectHolder();
+    var new_AIRCRAFTS = new ObjectHolder();
+    var new_PLAYERS = new ObjectHolder();
     
     // check each active aircraft (as a)
     AIRCRAFTS.forEach(function(a){
@@ -136,14 +147,12 @@ function updateGameData(){
             new_a.server = false;
             var new_p = cloneObject(a.getPlayer());
             new_p.server = false;
-            aircrafts.set(new_a);
-            players.set(new_p);
+            new_AIRCRAFTS.set(new_a);
+            new_PLAYERS.set(new_p);
         }
     });
-    
-    // update the player's game data & trigger the event
-    game_data.AIRCRAFTS = aircrafts;
-    game_data.PLAYERS = players;
+    game_data.AIRCRAFTS = new_AIRCRAFTS;
+    game_data.PLAYERS = new_PLAYERS;
 }
 updateGameData(PLAYERS.get(server_data.player_settings.id));
 
@@ -156,7 +165,7 @@ function setUserDestination(type, id){
         if(! id in CITIES){
             return false;
         }
-        new_dest = CITIES.get(id).position;
+        new_dest = cloneObject(CITIES.get(id).position);
     } else {
         return false;
     }

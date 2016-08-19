@@ -4,30 +4,51 @@ var aircraft_markers = new ObjectHolder();
 function drawAircrafts(){
     var game_settings = game_data.game_settings;
     var player_settings = game_data.player_settings;
-    var players = game_data.PLAYERS;
     var aircrafts = game_data.AIRCRAFTS;
     
-    // first remove markers that no longer exist
-    aircraft_markers.forEach(function(m){
-        if(! aircrafts.get(m.id)){
-            aircraft_markers.get(m.id).marker.remove();
+    function checkMarker(m){
+        if(!m || ! aircrafts.get(m.id)){
+            m.marker.remove();
             aircraft_markers.deleteById(m.id);
+            console.log('DRAWSCREEN ------------ the marker has disappeared!');
         }
-    });
+    }
+    function checkAircraft(a_id){
+        if(! aircrafts.get(a_id)){
+            checkMarker(aircraft_markers.get(a_id));
+            return false;
+        } else {
+            return true;
+        }
+    }
+    
+    // first remove markers that no longer exist
+    aircraft_markers.forEach(checkMarker);
     
     // for each aircraft
     aircrafts.forEach(function(a){
+        
+        // `a` might disappear at any moment, so check it exists & store the values, just in case
+        if(! a || ! checkAircraft(a.id)){
+            console.log('DRAWSCREEN ------------ the aircraft has disappeared!');
+            return;
+        }
+        var a_id = a.id;
+        var a_name = a.name;
+        var a_position = a.position;
+        var a_destination = a.destination;
         var p = a.getPlayer();
-        if(! aircrafts.get(a.id)){ return; }
+        var p_id = p.id;
+        var p_name = p.name;
         
         // if it doesn't exist, create a new marker
-        if(! aircraft_markers.get(a.id)){
+        if(! aircraft_markers.get(a_id)){
         
             // create an img element for the marker
             var el = document.createElement('div');
             el.className = 'aircraft_marker marker';
-            if(p.id == player_settings.id) el.className += ' user_marker';
-            el.setAttribute('id', a.id);
+            if(p_id == player_settings.id) el.className += ' user_marker';
+            el.setAttribute('id', a_id);
             
                 var image = document.createElement('div');
                 image.className = 'marker_image aircraft_image';
@@ -35,11 +56,11 @@ function drawAircrafts(){
 
                 var label = document.createElement('div');
                 label.className = 'marker_label aircraft_label';
-                label.innerText = a.name;
+                label.innerText = a_name;
 
                     var innerLabel = document.createElement('div');
                     innerLabel.className = 'inner_label';
-                    innerLabel.innerText = p.name;
+                    innerLabel.innerText = p_name;
                     label.appendChild(innerLabel);
 
             el.appendChild(image);
@@ -52,22 +73,22 @@ function drawAircrafts(){
 
             // add marker to map
             var marker = new mapboxgl.Marker(el)
-                            .setLngLat(LngLat(a.position))
+                            .setLngLat(LngLat(a_position))
                             .addTo(map);
             aircraft_markers.set({
-                id: a.id,
+                id: a_id,
                 marker: marker
             });
             
         } else {
-            aircraft_markers.get(a.id).marker.setLngLat(LngLat(a.position));
+            aircraft_markers.get(a_id).marker.setLngLat(LngLat(a_position));
         }
         var angle = 0;
-        if(a.destination && a.destination.type != 'none'){
-            angle = getAngle(a.position, a.destination);
+        if(a_destination && a_destination.type != 'none'){
+            angle = getAngle(a_position, a_destination);
         }
         angle -= map.getBearing();
-        $('.aircraft_marker[id="'+a.id+'"] .aircraft_image')
+        $('.aircraft_marker[id="'+a_id+'"] .aircraft_image')
         // .css('transform', 'rotate3d(1,0,0,'+map.getPitch()+'deg) rotate('+angle+'deg)');
         .css('transform', 'rotate('+angle+'deg)');
     });
@@ -123,7 +144,6 @@ function updateFow(){
     if(! map._loaded) return false;
     var game_settings = game_data.game_settings;
     var player_settings = game_data.player_settings;
-    var players = game_data.players;
     
     // draw the FoW
     function getFoW() {
@@ -193,8 +213,8 @@ function updateRangeCircle(){
             "geometry": {
                 "type": "LineString",
                 "coordinates": drawCircle(
-                    aircraft_markers.get(game_data.player_settings.id).marker.getLngLat(),
-                    getRangeKm(game_data.AIRCRAFTS.get(game_data.player_settings.id)),
+                    aircraft_markers.get(player_settings.id).marker.getLngLat(),
+                    getRangeKm(game_data.AIRCRAFTS.get(player_settings.id)),
                     1
                 )
            }
@@ -226,10 +246,10 @@ function updateRangeCircle(){
                 "line-cap": "round"
             },
             'paint': {
-                "line-color": "#eee",
+                "line-color": "#fff",
                 "line-width": 5,
-                'line-opacity': 0.2,
-                'line-dasharray': [1, 4]
+                'line-opacity': 0.5,
+                'line-dasharray': [1, 5]
             }
         });
     } else {
@@ -275,15 +295,11 @@ function updateAircraftIcons(){
 
 
 
-function onScreenUpdate(){
+function onScreenUpdate(next_tick=true){
     $(document).trigger('screenUpdate');
     tick(game_data.AIRCRAFTS, game_data.player_settings.tick_length);
     drawAircrafts();
+    if(next_tick) screenUpdate = setTimeout(onScreenUpdate, game_data.player_settings.tick_length);
 }
-var screenUpdate = setInterval(onScreenUpdate, game_data.player_settings.tick_length);
-
-function resetScreenUpdate(screen_update_frequency){
-    clearInterval(screenUpdate);
-    game_data.player_settings.screen_update_frequency = screen_update_frequency;
-    screenUpdate = setInterval(onScreenUpdate, screen_update_frequency);
-}
+var screenUpdate;
+onScreenUpdate();

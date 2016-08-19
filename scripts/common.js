@@ -28,9 +28,8 @@ function tick(aircrafts, tick_length){
             } else {
                 arrivedAircraft.push(a);
                 // set player position to the destination, hide the route path, and set info box to 0
-                a.position = a.destination;
-                a.destination.type="none";
-                a.destination.id="0";
+                a.position = cloneObject(a.destination);
+                a.destination.type = 'none';
                 p.sleep=server_data.game_settings.ai_sleep;
             }
         }
@@ -198,4 +197,11 @@ function getFlagUrl(filename, type='flag', size=''){
     if(size) size+='/';
     var url = game_data.game_settings.img_path +'/'+ type +'/'+ size + filename;
     return url;
+}
+
+function debugSingleTick(){
+    clearInterval(serverTicker);
+    clearTimeout(screenUpdate);
+    server.tick();
+    onScreenUpdate(false);
 }

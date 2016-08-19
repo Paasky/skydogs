@@ -13,8 +13,8 @@ function createMap(){
         style: 'mapbox://styles/paasky/ciqrm5tfn0003cem6ez8q3tmz',
         center: LngLat(PLAYERS.get(game_data.player_settings.id).getAircraft().position), // NYC
         zoom: 8,
-        minZoom: 6,
-        maxZoom: 10,
+        minZoom: 5,
+        maxZoom: 9,
         pitch: 30
     });
     map.setMaxBounds([
@@ -22,7 +22,7 @@ function createMap(){
         [game_settings.map_bounds.east, game_settings.map_bounds.north]
     ]);
     map.on('zoom', function(){
-        map.setPitch( ( map.getZoom() - 6 ) * 15 );
+        map.setPitch( ( map.getZoom() - 5 ) * 15 );
     });
     
     // create cities

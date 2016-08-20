@@ -71,6 +71,7 @@ function ObjectHolder(){
 }
 
 
+
 var AIRCRAFTS = new ObjectHolder();
 function Aircraft(id, name, fuel, speed, position, destination, player_id, server) {
     if(server===undefined) server=true;
@@ -81,8 +82,60 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
     this.position = position;
     this.destination = destination;
     this.server = server;
+    this.cargoHold = new ObjectHolder();
     
     this.getPlayer = function(){ if(this.server){ return PLAYERS.get(player_id); } else { return game_data.PLAYERS.get(player_id); } };
+    this.addCargo = function(commodity, amount, purchasePrice){
+        if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+        var currentCommodity = this.cargoHold.get(commodity.id);
+        if(currentCommodity){
+            if(purchasePrice){
+                var a = currentCommodity.amount;
+                var b = currentCommodity.valuePerItem;
+                var c = amount;
+                var d = purchasePrice;
+                var newValuePerItem = (a*b + c*d) / (a + c);
+                currentCommodity.valuePerItem = newValuePerItem;
+            }
+            currentCommodity.amount += amount;
+        } else {
+            var newCommodity = cloneObject(commodity);
+            newCommodity.valuePerItem = purchasePrice;
+            newCommodity.amount = amount;
+            this.cargoHold.set(newCommodity);
+        }
+        return { success: true, message: 'Commodity added into Cargo Hold' };
+    }
+    this.takeCargo = function(commodity, amount){
+        if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+        var checkStatus = this.getCargo(commodity, amount);
+        if(!checkStatus.success) return checkStatus;
+
+        var cargoHoldCommodity = checkStatus.message;
+
+        // remove the amount & check if there's any left
+        cargoHoldCommodity.amount -= amount;
+        if(cargoHoldCommodity.amount <= 0) this.cargoHold.deleteById(commodity.id);
+        return { success: true, message: 'Cargo taken from Cargo Hold' };
+    }
+    this.getCargo = function(commodity, amount){
+        var cargoHoldCommodity = this.cargoHold.get(commodity.id);
+
+        // do we even have that commodity?
+        if(!cargoHoldCommodity) return { success: false, message: 'Cargo Hold does not have this commodity' };
+
+        if(!amount) return { success: true, message: cargoHoldCommodity };
+
+        if(cargoHoldCommodity.amount <= 0){
+            this.cargoHold.deleteById(commodity.id);
+            return { success: false, message: 'Cargo Hold does not have this commodity' };
+        }
+
+        // do we have enough of the commodity?
+        if(cargoHoldCommodity.amount < amount) return { success: false, message: 'Cargo Hold does not that much of this commodity' };
+
+        return { success: true, message: cargoHoldCommodity };
+    }
 }
 
 var COUNTRIES = new ObjectHolder();
@@ -103,7 +156,15 @@ function City(id, name, country_id, population, position) {
     this.population = population;
     this.position = position;
     
-    this.getCountry = function(){ return COUNTRIES[country_id] };
+    this.getCountry = function(){ return COUNTRIES.get(country_id) };
+    this.getCommodityPrice = function(id){
+        var co = COMMODITIES.get(id);
+        if(co){
+            return co.base_price;
+        } else {
+            return false;
+        }
+    }
 }
 
 

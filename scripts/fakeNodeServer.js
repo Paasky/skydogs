@@ -127,7 +127,8 @@ var game_data = {
     COUNTRIES: COUNTRIES,
     CITIES: CITIES,
     PLAYERS: new ObjectHolder(),
-    AIRCRAFTS: new ObjectHolder()
+    AIRCRAFTS: new ObjectHolder(),
+    COMMODITIES: COMMODITIES,
 };
 
 function updateGameData(){
@@ -168,12 +169,10 @@ function setDestination(type, id){
     var new_dest;
     
     if(type=='city'){
-        if(! id in CITIES){
-            return false;
-        }
+        if(! id in CITIES) return {success: false, message: 'City does not exist'};
         new_dest = cloneObject(CITIES.get(id).position);
     } else {
-        return false;
+        return {success: false, message: 'Destination type not supported'};
     }
     
     var range = hasRange(aircraft, new_dest, aircraft.speed);
@@ -182,16 +181,26 @@ function setDestination(type, id){
         aircraft.destination.type = type;
         aircraft.destination.id = id;
         $(document).trigger('cityLeave', aircraft.id);
-        return 'up up and away!';
+        return {success: true, message: 'Up up and away!'};;
     } else {
-        return 'Not enough range! Current range: '+range.range_km+' km, distance: '+Math.round(range.dist.km)+' km';
+        return {
+            success: false,
+            message: 'Not enough range! Current range: '+range.range_km+' km, distance: '+Math.round(range.dist.km)+' km'
+        };
     }
 }
 
 function buyCommodity(type_id, amount){
-    var p = PLAYERS.get(server_data.player_settings.id);
-    var a = p.getAircraft();
-    var c = CITIES.get(a.position.id);
-    if(!c) return {success: false, message: 'Land in a city before trying to buy commodities'};
-    
+    var player = PLAYERS.get(server_data.player_settings.id);
+    var aircrat = player.getAircraft();
+    var city = CITIES.get(aircraft.position.id);
+    if(!city) return {success: false, message: 'Land in a city before trying to buy commodities'};
+    var co = COMMODITIES.get(type_id);
+    if(!co) return {success: false, message: 'Commodity does not exist'};
+    var co_price = city.getCommodityPrice(type_id);
+    var sum = co_price * amount;
+    if(player.money >= sum ){
+        player.money -= sum;
+
+    }
 }

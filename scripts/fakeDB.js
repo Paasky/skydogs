@@ -165,6 +165,33 @@ function getDB(){
         ]
     ];
     
+    var commodities_raw = [
+        {"id":1,"name":"Cotton","base_cost":0.14,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.000,"req_cargo_id":13,"req_cargo_mod":2.265},
+        {"id":2,"name":"Tobacco","base_cost":0.12,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.000,"req_cargo_id":22,"req_cargo_mod":0.838},
+        {"id":3,"name":"Corn","base_cost":0.09,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.177},
+        {"id":4,"name":"Wheat","base_cost":0.11,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.067},
+        {"id":5,"name":"Oats","base_cost":0.04,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.090},
+        {"id":6,"name":"Vegetables","base_cost":0.07,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.240},
+        {"id":7,"name":"Fruit","base_cost":0.11,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.100},
+        {"id":8,"name":"Helium","base_cost":0.30,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.000},
+        {"id":9,"name":"Canned Goods","base_cost":0.17,"weight":1.0,"unit":"can","units":"cans","req_per_pop":0.043},
+        {"id":10,"name":"Confectionary","base_cost":0.45,"weight":0.5,"unit":"box","units":"boxes","req_per_pop":0.007},
+        {"id":11,"name":"Liquor","base_cost":0.30,"weight":2.0,"unit":"bottle","units":"bottles","req_per_pop":0.019},
+        {"id":12,"name":"Packed Meat","base_cost":0.20,"weight":1.0,"unit":"can","units":"cans","req_per_pop":0.123},
+        {"id":13,"name":"Textiles","base_cost":0.60,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.024},
+        {"id":14,"name":"Chemicals","base_cost":0.80,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.010},
+        {"id":15,"name":"Medicine","base_cost":0.90,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.002},
+        {"id":16,"name":"Cosmetics","base_cost":0.90,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.001},
+        {"id":17,"name":"Fertilizer","base_cost":0.20,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.018},
+        {"id":18,"name":"Petroleum","base_cost":0.35,"weight":6.0,"unit":"gallon","units":"gallons","req_per_pop":0.063},
+        {"id":19,"name":"Machinery","base_cost":5.00,"weight":10.0,"unit":"box","units":"boxes","req_per_pop":0.003},
+        {"id":20,"name":"Jewelry","base_cost":2.00,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.001},
+        {"id":21,"name":"Electronics","base_cost":8.00,"weight":15.0,"unit":"box","units":"boxes","req_per_pop":0.001},
+        {"id":22,"name":"Cigarettes","base_cost":0.60,"weight":0.5,"unit":"carton","units":"cartons","req_per_pop":0.015},
+        {"id":23,"name":"Toys","base_cost":1.50,"weight":1.0,"unit":"box","units":"boxes","req_per_pop":0.001},
+    ];
+
+
     // create country data
     countries_raw.forEach(function(c){
         COUNTRIES.set( new Country(c.id, c.name, c.flag_file, c.color, c.color2, c.is_dry) );
@@ -180,6 +207,11 @@ function getDB(){
         CITIES.set( new City(c.id, c.name, c.country_id, c.pop, c.position) );
     });
     
+    // create commodities data
+    commodities_raw.forEach(function(c){
+        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, c.base_cost, c.req_per_pop, c.req_cargo_id, c.req_cargo_mod) );
+    });
+
     
     // create player & aircraft data
     var i = 0;

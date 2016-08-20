@@ -121,3 +121,19 @@ function Player(id, name, ai, money, aircraft_id, server) {
     this.getDestination = function(){ return this.getAircraft().destination };
     this.getSpeed = function(){ return this.getAircraft().speed }
 }
+
+var COMMODITIES = new ObjectHolder();
+function Commodity(id, name, unit, units, weight, base_price, req_per_pop, req_cargo_id, req_cargo_mod){
+    this.id = id;
+    this.name = name;
+    this.unit = unit;
+    this.units = units;
+    this.weight = weight;
+    this.base_price = base_price;
+    this.req_per_pop = req_per_pop;
+    this.req_cargo_id = req_cargo_id;
+    this.req_cargo_mod = req_cargo_mod;
+
+    this.getUnit = function(amount){ if(amount==1){ return this.unit; } else { return this.units; } }
+    this.getAveragePrice = function(){ return this.base_price; }
+}

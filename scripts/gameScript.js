@@ -21,7 +21,7 @@ $(document).mousemove(function(event) {
 
 $(document).on('cityClick', function(e, city){
     log('user clicks on city '+city.name);
-    log(setUserDestination('city', city.id));
+    log(setDestination('city', city.id));
 });
 $(document).on('game_dataUpdated', function(){
     console.log('game_dataUpdated');

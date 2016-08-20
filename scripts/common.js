@@ -82,7 +82,8 @@ function getAngleOfAttack(pos_attacker, pos_defender,
 }
 
 // calculates the distance between two points
-function getDistances(pos1, pos2, speed=false, tick_length){
+function getDistances(pos1, pos2, speed, tick_length){
+    if(speed===undefined) speed=false;
     //--------  Distance in Geo  --------
     var dist_x = pos2.lng - pos1.lng;
     var dist_y = pos2.lat - pos1.lat;
@@ -154,7 +155,8 @@ function getDistances(pos1, pos2, speed=false, tick_length){
     return result;
 }
 
-function hasRange(aircraft, destination, speed=false){
+function hasRange(aircraft, destination, speed){
+    if(speed===undefined) speed=false;
     var dist = getDistances(aircraft.position, destination, speed);
     var range_km = getRangeKm(aircraft);
     var reply = {
@@ -193,7 +195,9 @@ function getAngle(from, to) {
 }
 
 // get url of a flag
-function getFlagUrl(filename, type='flag', size=''){
+function getFlagUrl(filename, type, size){
+    if(type===undefined) type='flag';
+    if(size===undefined) size='';
     if(size) size+='/';
     var url = game_data.game_settings.img_path +'/'+ type +'/'+ size + filename;
     return url;

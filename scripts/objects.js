@@ -72,7 +72,8 @@ function ObjectHolder(){
 
 
 var AIRCRAFTS = new ObjectHolder();
-function Aircraft(id, name, fuel, speed, position, destination, player_id, server=true) {
+function Aircraft(id, name, fuel, speed, position, destination, player_id, server) {
+    if(server===undefined) server=true;
     this.id = id;
     this.name = name;
     this.fuel = fuel;
@@ -107,7 +108,8 @@ function City(id, name, country_id, population, position) {
 
 
 var PLAYERS = new ObjectHolder();
-function Player(id, name, ai, money, aircraft_id, server=true) {
+function Player(id, name, ai, money, aircraft_id, server) {
+    if(server===undefined) server=true;
     this.id = id;
     this.name = name;
     this.ai = ai;

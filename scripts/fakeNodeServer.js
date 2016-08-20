@@ -163,7 +163,7 @@ function updateGameData(){
 updateGameData(PLAYERS.get(server_data.player_settings.id));
 
 
-function setUserDestination(type, id){
+function setDestination(type, id){
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
     var new_dest;
     
@@ -186,4 +186,12 @@ function setUserDestination(type, id){
     } else {
         return 'Not enough range! Current range: '+range.range_km+' km, distance: '+Math.round(range.dist.km)+' km';
     }
+}
+
+function buyCommodity(type_id, amount){
+    var p = PLAYERS.get(server_data.player_settings.id);
+    var a = p.getAircraft();
+    var c = CITIES.get(a.position.id);
+    if(!c) return {success: false, message: 'Land in a city before trying to buy commodities'};
+    
 }

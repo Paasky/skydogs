@@ -13,7 +13,7 @@ function createMap(){
     map = new mapboxgl.Map({
         container: 'map-canvas',
         style: 'mapbox://styles/paasky/ciqrm5tfn0003cem6ez8q3tmz',
-        center: LngLat(PLAYERS.get(game_data.player_settings.id).getAircraft().position), // NYC
+        center: PLAYERS.get(game_data.player_settings.id).getAircraft().position,
         zoom: 8,
         minZoom: 6,
         maxZoom: 10,
@@ -52,7 +52,7 @@ function createMap(){
 
         // add marker to map
         new mapboxgl.Marker(el)
-            .setLngLat(LngLat(city.position))
+            .setLngLat(city.position)
             .addTo(map);
     });
     

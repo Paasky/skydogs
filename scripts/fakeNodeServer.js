@@ -60,6 +60,12 @@ var server = {
             
             // if the player isn't going anywhere
             if(a.destination.type=="none" && p.ai){
+                // is the AI marked for deletion
+                if(p.deleteAI){
+                    AIRCRAFTS.deleteById(a.id);
+                    PLAYERS.deleteById(p.id);
+                    return;
+                }
                 // if the current player is sleeping in the city
                 if(p.sleep>0){
                     p.sleep--;
@@ -109,8 +115,31 @@ var server = {
                 $(document).trigger('cityArrive', a.id);
             }
         });
-    }
+        tickCounter++;
+        if(tickCounter==100){
+            tickCounter=0;
+            server.superTick();
+        }
+    },
+    superTick: function(){
+        console.log('supertick!');
+        // recalc economy
+
+        // checkAI
+        var AIlimit = 100;
+        if(PLAYERS.ids.length > AIlimit){
+            var toRemove = PLAYERS.ids.length - AIlimit;
+            PLAYERS.forEach(function(p){
+                if(!p.ai || toRemove==0) return;
+                p.deleteAI = true;
+                toRemove--;
+            });
+        } else {
+
+        }
+    },
 };
+var tickCounter = 0;
 var serverTicker = setInterval(server.tick, server_data.game_settings.tick_length);
 
 

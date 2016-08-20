@@ -223,11 +223,20 @@ function getDB(){
             lng: parseFloat(p.lng),
             id: p.location_id
         };
-        p.destination = {
-            lat: parseFloat(p.lat),
-            lng: parseFloat(p.lng),
-            id: p.location_id,
-            type: 'none'
+        if(p.ai=="0"){
+            p.destination = {
+                lat: parseFloat(p.end_lat),
+                lng: parseFloat(p.end_lng),
+                id: p.end_id,
+                type: p.end_type
+            }
+        } else {
+            p.destination = {
+                lat: parseFloat(p.lat),
+                lng: parseFloat(p.lng),
+                id: p.location_id,
+                type: 'none'
+            }
         }
         p.fuel = {
             amount: 100,
@@ -236,7 +245,7 @@ function getDB(){
         };
         p.speed = 360;
         
-        PLAYERS.set( new Player(p.id, p.name, isAI(p.ai), Math.round(Math.random()*100)+50, p.id) );
+        PLAYERS.set( new Player(parseInt(p.id), p.name, isAI(p.ai), Math.round(Math.random()*100)+50, p.id) );
         var a_name = '';
         if(Math.round(Math.random()) == 0){
             a_name = names[0][Math.floor(Math.random()*names[0].length)];
@@ -246,7 +255,7 @@ function getDB(){
                 ' '+
                 names[1][1][Math.floor(Math.random()*names[1][1].length)];
         }
-        AIRCRAFTS.set( new Aircraft(p.id, a_name, p.fuel, p.speed, p.position, p.destination, p.id) );
+        AIRCRAFTS.set( new Aircraft(parseInt(p.id), a_name, p.fuel, p.speed, p.position, p.destination, p.id) );
     });
     function isAI(ai){
         if(ai=="1"){ return true } else { return false; }

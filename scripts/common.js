@@ -1,8 +1,3 @@
-// generic LatLng object
-function LngLat(obj) {
-    return [obj.lng, obj.lat];
-}
-
 function tick(aircrafts, tick_length){
     var arrivedAircraft = [];
     aircrafts.forEach(function(a){
@@ -208,4 +203,19 @@ function debugSingleTick(){
     clearInterval(screenUpdate);
     server.tick();
     onScreenUpdate();
+}
+
+function getFirstFreePlayerId(){
+    for(i=1;;i++){
+        if(PLAYERS.ids.indexOf(i)==-1){
+            return i;
+        }
+    }
+}
+function getFirstFreeAircraftId(){
+    for(i=1;;i++){
+        if(AIRCRAFTS.ids.indexOf(i)==-1){
+            return i;
+        }
+    }
 }

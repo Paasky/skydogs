@@ -75,7 +75,7 @@ function drawAircrafts(){
 
             // add marker to map
             var marker = new mapboxgl.Marker(el)
-                            .setLngLat(LngLat(a_position))
+                            .setLngLat(a_position)
                             .addTo(map);
             aircraft_markers.set({
                 id: a_id,
@@ -83,7 +83,7 @@ function drawAircrafts(){
             });
             
         } else {
-            aircraft_markers.get(a_id).marker.setLngLat(LngLat(a_position));
+            aircraft_markers.get(a_id).marker.setLngLat(a_position);
         }
         
         if(a_destination && a_destination.type != 'none'){

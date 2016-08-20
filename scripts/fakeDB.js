@@ -236,7 +236,7 @@ function getDB(){
         };
         p.speed = 360;
         
-        PLAYERS.set( new Player(p.id, p.name, isAI(p.ai), Math.round(Math.random()*1000)+500, p.id) );
+        PLAYERS.set( new Player(p.id, p.name, isAI(p.ai), Math.round(Math.random()*100)+50, p.id) );
         var a_name = '';
         if(Math.round(Math.random()) == 0){
             a_name = names[0][Math.floor(Math.random()*names[0].length)];

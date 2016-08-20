@@ -190,17 +190,33 @@ function setDestination(type, id){
     }
 }
 
-function buyCommodity(type_id, amount){
+function buyCommodity(commodity, amount){
+    if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
     var player = PLAYERS.get(server_data.player_settings.id);
-    var aircrat = player.getAircraft();
+    var aircraft = player.getAircraft();
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to buy commodities'};
-    var co = COMMODITIES.get(type_id);
-    if(!co) return {success: false, message: 'Commodity does not exist'};
-    var co_price = city.getCommodityPrice(type_id);
-    var sum = co_price * amount;
-    if(player.money >= sum ){
-        player.money -= sum;
 
-    }
+    var co_price = city.getCommoditySalePrice(commodity);
+    var sum = co_price * amount;
+    if(player.money < sum ) return {success: false, message: 'Not enough money'};
+
+    player.money -= sum;
+    var addStatus = aircraft.addCargo(commodity, amount, co_price);
+    if(!addStatus.success) return addStatus;
+    return {success: true, message: 'Purchase successful'};
+}
+
+function sellCommodity(commodity, amount){
+    if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+    var player = PLAYERS.get(server_data.player_settings.id);
+    var aircraft = player.getAircraft();
+    var city = CITIES.get(aircraft.position.id);
+    if(!city) return {success: false, message: 'Land in a city before trying to sell commodities'};
+
+    var co_price = city.getCommodityBuyPrice(commodity);
+    var cargoStatus = aircraft.takeCargo(commodity, amount);
+    if(!cargoStatus.success) return cargoStatus;
+    player.money += amount * co_price;
+    return {success: true, message: 'Sale successful'};
 }

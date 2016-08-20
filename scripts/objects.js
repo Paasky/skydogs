@@ -157,13 +157,11 @@ function City(id, name, country_id, population, position) {
     this.position = position;
     
     this.getCountry = function(){ return COUNTRIES.get(country_id) };
-    this.getCommodityPrice = function(id){
-        var co = COMMODITIES.get(id);
-        if(co){
-            return co.base_price;
-        } else {
-            return false;
-        }
+    this.getCommodityBuyPrice = function(commodity){
+        return commodity.base_price*0.9;
+    }
+    this.getCommoditySalePrice = function(commodity){
+        return commodity.base_price*1.1;
     }
 }
 

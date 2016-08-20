@@ -220,3 +220,34 @@ function sellCommodity(commodity, amount){
     player.money += amount * co_price;
     return {success: true, message: 'Sale successful'};
 }
+
+function refuel(amount){
+    if(!amount) return {success: false, message: 'amount is required'};
+    var player = PLAYERS.get(server_data.player_settings.id);
+    var aircraft = player.getAircraft();
+    var city = CITIES.get(aircraft.position.id);
+    if(!city) return {success: false, message: 'Land in a city before trying to refuel'};
+
+    if(amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
+
+    var co_price = city.getCommoditySalePrice(COMMODITIES.get(18)); // 18 = petroleum
+    var sum = co_price * amount;
+    if(player.money < sum ) return {success: false, message: 'Not enough money'};
+
+    player.money -= sum;
+    aircraft.fuel.amount += amount;
+    return {success: true, message: 'Refuel successful'};
+}
+
+function refuelFromCargoHold(amount){
+    if(!amount) return {success: false, message: 'amount is required'};
+    var player = PLAYERS.get(server_data.player_settings.id);
+    var aircraft = player.getAircraft();
+
+    if(amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
+
+    var cargoStatus = aircraft.takeCargo(COMMODITIES.get(18), amount);
+    if(!cargoStatus.success) return cargoStatus;
+    aircraft.fuel.amount += amount;
+    return {success: true, message: 'Refuel successful'};
+}

@@ -14,6 +14,7 @@ var server_data = {
         geo_per_kmh: 0.5,
         ai_sleep: 10,
         tick_length: 500,
+        super_tick_length: 100,
         
         z_index: {
             border: 10,
@@ -55,7 +56,7 @@ getDB();
 
 var server = {
     ai: {
-        merchantAI: function(p){
+        anwhereAI: function(p){
             var a = p.getAircraft();
             
             // if the player isn't going anywhere
@@ -92,10 +93,95 @@ var server = {
                         //console.log('MERCHANTAI ------------ Everything is too far away! Fallback to closest city.');
                     }
                     var city = CITIES.get(rand_id);
-                    //console.log(p.name+' ('+p.id+') '+ 'heads for '+city.name);
+                    console.log('anywhereAI ('+p.id+'): heads for '+city.name);
                     a.destination = cloneObject(city.position);
                     a.destination.type = "city";
                     a.destination.id = rand_id;
+                    if(game_data.AIRCRAFTS.get(a.id)){
+                        $(document).trigger('cityLeave', a.id);
+                    }
+                }
+            }
+        },
+        merchantAI: function(p){
+            var a = p.getAircraft();
+
+            // if the player isn't going anywhere
+            if(a.destination.type=="none" && p.ai){
+                // is the AI marked for deletion
+                if(p.deleteAI){
+                    console.log('deleting AI '+a.id);
+                    AIRCRAFTS.deleteById(a.id);
+                    PLAYERS.deleteById(p.id);
+                    return;
+                }
+                if(!a.position.id){
+                    server.ai.anwhereAI(p);
+                    return;
+                }
+                // if the current player is sleeping in the city
+                if(p.sleep>0){
+                    p.sleep--;
+
+                // if the player is active, do stuff
+                } else {
+                    // find cities that are in range
+                    var amount = 250;
+                    var bestProfit = {profit: 0, id:0};
+                    var currentCity = CITIES.get(a.position.id);
+                    CITIES.forEach(function(checkCity){
+                        var range = hasRange(a, checkCity.position);
+
+                        // not in range -> don't bother
+                        if(!range.success) return;
+
+                        // loop through each commodity
+                        COMMODITIES.forEach(function(co){
+
+                            // check can we buy & sell this & can we afford it
+                            var purchaseStatus = currentCity.getCommoditySalePrice(co, amount);
+                            var sellStatus = checkCity.getCommodityBuyPrice(co, amount);
+                            if(!purchaseStatus.success || !sellStatus.success) return;
+                            var cost = amount * purchaseStatus.message;
+                            var sales = amount * sellStatus.message;
+                            if(cost > p.money) return;
+
+                            // profit from sales
+                            var profit = sales - cost;
+                            if(profit < 0) return;
+
+                            // costs & actual profit
+                            var flightCosts = getCostPerKm(a) * range.dist.km;
+                            var routeProfit = profit - flightCosts;
+
+                            // is it better then what we have?
+                            if(bestProfit.profit < routeProfit){
+                                bestProfit.profit = routeProfit;
+                                bestProfit.id = checkCity.id;
+                            }
+                        });
+                    });
+
+                    var city = CITIES.get(bestProfit.id);
+                    if(!city){
+                        if(!p.supersleeps) p.supersleeps=0;
+                        p.supersleeps++;
+                        if(p.supersleeps>5){
+                            console.log('merchantAI ('+p.id+'): no profitable route found for the '+p.supersleeps+'. time, mark for deletion');
+                            p.deleteAI=true;
+                            p.sleep=0;
+                            return;
+                        } else {
+                            console.log('merchantAI ('+p.id+'): no profitable route found! Sleeping for a superTick, '+p.supersleeps+'. time');
+                            p.sleep = server_data.game_settings.super_tick_length;
+                            return;
+                        }
+                    }
+                    p.supersleeps=0;
+                    console.log('merchantAI ('+p.id+'): heads for '+city.name+' for $'+Math.round(bestProfit.profit)+' profit!');
+                    a.destination = cloneObject(city.position);
+                    a.destination.type = "city";
+                    a.destination.id = city.id;
                     if(game_data.AIRCRAFTS.get(a.id)){
                         $(document).trigger('cityLeave', a.id);
                     }
@@ -115,7 +201,7 @@ var server = {
                 $(document).trigger('cityArrive', a.id);
             }
         });
-        if(tickCounter>100){
+        if(tickCounter>server_data.game_settings.super_tick_length){
             tickCounter=0;
             server.superTick();
         }
@@ -127,16 +213,12 @@ var server = {
         // recalc economy, for each commodity in each city.market
         CITIES.forEach(function(c){
             c.market.forEach(function(co){
-                /*  amount: 74101
-                    id: 5
-                    price: 0.47
-                    production: 6214.4
-                    required: 14506 */
 
                 // 1st the city eats the required amount and produces the produced amount
-                var amount = Math.round(co.amount-co.required+co.production);
+                var amount = co.amount-co.required;
+                if(co.production) amount += co.production;
                 if(amount<0) amount=0;
-                co.amount = amount;
+                co.amount = Math.round(amount);
 
                 // set the market price
                 co.price = getCommodityPrice(co.amount, co.required, COMMODITIES.get(co.id).base_price);
@@ -144,7 +226,7 @@ var server = {
         });
 
         // checkAI
-        var AIlimit = 100;
+        var AIlimit = 50;
 
         // mark extra AI players for deletion
         if(PLAYERS.ids.length > AIlimit){
@@ -161,7 +243,7 @@ var server = {
         }
     },
 };
-var tickCounter = 100;
+var tickCounter = server_data.game_settings.super_tick_length;
 var serverTicker = setInterval(server.tick, server_data.game_settings.tick_length);
 
 

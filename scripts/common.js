@@ -159,9 +159,9 @@ function hasRange(aircraft, destination, speed){
         range_km: range_km
     }
     if(dist.km <= range_km){
-        reply.status = true;
+        reply.success = true;
     } else {
-        reply.status = false;
+        reply.success = false;
     }
     return reply;
 }
@@ -245,5 +245,11 @@ function getPriceModifier(orig_amount, orig_required){
 }
 
 function getCommodityPrice(amount, required, base_price){
+    if(amount<=0 && required<=0) return Math.round(0.5 * base_price *100)/100;
     return Math.round(getPriceModifier(amount, required) * base_price *100)/100;
+}
+
+function getCostPerKm(aircraft){
+    // 18 = fuel
+    return COMMODITIES.get(18).base_price * aircraft.fuel.consumption
 }

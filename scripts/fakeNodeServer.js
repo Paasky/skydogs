@@ -108,6 +108,7 @@ var server = {
 
             // if the player isn't going anywhere
             if(a.destination.type=="none" && p.ai){
+
                 // is the AI marked for deletion
                 if(p.deleteAI){
                     console.log('deleting AI '+a.id);
@@ -115,7 +116,10 @@ var server = {
                     PLAYERS.deleteById(p.id);
                     return;
                 }
-                if(!a.position.id){
+
+                //do we know where the ai is?
+                var currentCity = CITIES.get(a.position.id);
+                if(!currentCity){
                     server.ai.anwhereAI(p);
                     return;
                 }
@@ -125,10 +129,10 @@ var server = {
 
                 // if the player is active, do stuff
                 } else {
-                    // find cities that are in range
                     var amount = 250;
                     var bestProfit = {profit: 0, id:0};
-                    var currentCity = CITIES.get(a.position.id);
+
+                    // find cities that are in range
                     CITIES.forEach(function(checkCity){
                         var range = hasRange(a, checkCity.position);
 
@@ -138,15 +142,17 @@ var server = {
                         // loop through each commodity
                         COMMODITIES.forEach(function(co){
 
-                            // check can we buy & sell this & can we afford it
+                            // check can we buy & sell this
                             var purchaseStatus = currentCity.getCommoditySalePrice(co, amount);
                             var sellStatus = checkCity.getCommodityBuyPrice(co, amount);
                             if(!purchaseStatus.success || !sellStatus.success) return;
+
+                            //  can we afford it?
                             var cost = amount * purchaseStatus.message;
-                            var sales = amount * sellStatus.message;
                             if(cost > p.money) return;
 
-                            // profit from sales
+                            // do we get any profit?
+                            var sales = amount * sellStatus.message;
                             var profit = sales - cost;
                             if(profit < 0) return;
 
@@ -154,7 +160,7 @@ var server = {
                             var flightCosts = getCostPerKm(a) * range.dist.km;
                             var routeProfit = profit - flightCosts;
 
-                            // is it better then what we have?
+                            // is it better than what we have?
                             if(bestProfit.profit < routeProfit){
                                 bestProfit.profit = routeProfit;
                                 bestProfit.id = checkCity.id;

@@ -219,3 +219,27 @@ function getFirstFreeAircraftId(){
         }
     }
 }
+
+function getPriceModifier(orig_amount, orig_required){
+    var modifier;
+
+    // standardize amount & required
+    var amount = orig_amount/orig_required*100;
+    var required = 100;
+
+    // cities want to keep 5 times their requirement in storage
+    // if they have more, the prices go down
+    // if they have less, the prices goes up
+
+    // surplus -> lower prices
+    if(amount > required*5){
+        modifier = 41.3 * Math.pow(amount+required, -0.577);
+
+    // demand -> higher prices
+    } else {
+        modifier = 11.76 / Math.pow(amount+required, 0.385);
+    }
+    if(modifier < 0.5) modifier = 0.5;
+    if(modifier > 2) modifier = 2;
+    return modifier;
+}

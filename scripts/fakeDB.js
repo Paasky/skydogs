@@ -4226,7 +4226,8 @@ function getDB(){
     
     // create commodities data
     commodities_raw.forEach(function(c){
-        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, c.base_cost, c.req_per_pop, c.req_cargo_id, c.req_cargo_mod) );
+        // each commodity is worth 10x more than IRL, but is also required 1/10th of IRL
+        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, c.base_cost*10, c.req_per_pop/10, c.req_cargo_id, c.req_cargo_mod) );
     });
     
     // create city data
@@ -4241,17 +4242,30 @@ function getDB(){
         // create the market
         var totalPop = c.pop.city+c.pop.suburban+c.pop.rural;
         COMMODITIES.forEach(function(co){
+
+            // this city requires this much of this commodity
             var required = Math.round(co.req_per_pop * totalPop);
             if(co.req_rural_only) required = Math.round(co.req_per_pop * c.pop.rural);
+
+            // this city has this much of this commodity in stock
             var amount = Math.round(required * (Math.random()*3+3) );
-            CITIES.get(c.id).market.set({ id: co.id, amount: amount, required: required });
+
+            // set the market price
+            var price = Math.round(getPriceModifier(amount, required) * co.base_price *100)/100;
+
+            // add this commodity to the market of this city
+            CITIES.get(c.id).market.set({ id: co.id, amount: amount, required: required, price: price });
         });
 
         // set production values
         var productions = city_prod[c.id];
         productions.forEach(function(co){
-            CITIES.get(c.id).market.get(co.cargo_id).production = co.amount;
-            CITIES.get(c.id).market.get(co.cargo_id).amount += (co.amount * 5);
+
+            // produce 1/10th of IRL
+            CITIES.get(c.id).market.get(co.cargo_id).production = co.amount / 10;
+
+            // add more to the market, again 1/10th of IRL
+            CITIES.get(c.id).market.get(co.cargo_id).amount += Math.round(co.amount * (Math.random()*3+3) / 10);
         });
 
         // set amounts for cotton (1) & tobacco (2)

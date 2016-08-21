@@ -155,6 +155,7 @@ function City(id, name, country_id, population, position) {
     this.name = name;
     this.population = population;
     this.position = position;
+    this.market = new ObjectHolder();
     
     this.getCountry = function(){ return COUNTRIES.get(country_id) };
     this.getCommodityBuyPrice = function(commodity){

@@ -419,7 +419,7 @@ function getDB(){
         {"id":15,"name":"Medicine","base_cost":0.90,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.002},
         {"id":16,"name":"Cosmetics","base_cost":0.90,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.001},
         {"id":17,"name":"Fertilizer","base_cost":0.20,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.018,"req_rural_only":true},
-        {"id":18,"name":"Petroleum","base_cost":0.35,"weight":6.0,"unit":"gallon","units":"gallons","req_per_pop":0.063},
+        {"id":18,"name":"Fuel","base_cost":0.35,"weight":6.0,"unit":"gallon","units":"gallons","req_per_pop":0.063},
         {"id":19,"name":"Machinery","base_cost":5.00,"weight":10.0,"unit":"box","units":"boxes","req_per_pop":0.003},
         {"id":20,"name":"Jewelry","base_cost":2.00,"weight":1.0,"unit":"lb","units":"lbs","req_per_pop":0.001},
         {"id":21,"name":"Electronics","base_cost":8.00,"weight":15.0,"unit":"box","units":"boxes","req_per_pop":0.001},

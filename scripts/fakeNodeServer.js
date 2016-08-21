@@ -396,8 +396,9 @@ function refuel(amount){
 
     if(amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
 
-    var co_price = city.getCommoditySalePrice(COMMODITIES.get(18)); // 18 = petroleum
-    var sum = co_price * amount;
+    var priceReply = city.getCommoditySalePrice(COMMODITIES.get(18)); // 18 = fuel
+    if(!priceReply.success) return priceReply;
+    var sum = priceReply.message * amount;
     if(player.money < sum ) return {success: false, message: 'Not enough money'};
 
     player.money -= sum;

@@ -115,18 +115,38 @@ var server = {
                 $(document).trigger('cityArrive', a.id);
             }
         });
-        tickCounter++;
-        if(tickCounter==100){
+        if(tickCounter>100){
             tickCounter=0;
             server.superTick();
         }
+        tickCounter++;
     },
     superTick: function(){
         console.log('supertick!');
-        // recalc economy
+
+        // recalc economy, for each commodity in each city.market
+        CITIES.forEach(function(c){
+            c.market.forEach(function(co){
+                /*  amount: 74101
+                    id: 5
+                    price: 0.47
+                    production: 6214.4
+                    required: 14506 */
+
+                // 1st the city eats the required amount and produces the produced amount
+                var amount = Math.round(co.amount-co.required+co.production);
+                if(amount<0) amount=0;
+                co.amount = amount;
+
+                // set the market price
+                co.price = getCommodityPrice(co.amount, co.required, COMMODITIES.get(co.id).base_price);
+            });
+        });
 
         // checkAI
         var AIlimit = 100;
+
+        // mark extra AI players for deletion
         if(PLAYERS.ids.length > AIlimit){
             var toRemove = PLAYERS.ids.length - AIlimit;
             PLAYERS.forEach(function(p){
@@ -134,12 +154,14 @@ var server = {
                 p.deleteAI = true;
                 toRemove--;
             });
+
+        // create new AI's
         } else {
 
         }
     },
 };
-var tickCounter = 0;
+var tickCounter = 100;
 var serverTicker = setInterval(server.tick, server_data.game_settings.tick_length);
 
 
@@ -220,33 +242,60 @@ function setDestination(type, id){
 }
 
 function buyCommodity(commodity, amount){
+
+    // check variables
     if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+
+    // get required variables
     var player = PLAYERS.get(server_data.player_settings.id);
     var aircraft = player.getAircraft();
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to buy commodities'};
 
-    var co_price = city.getCommoditySalePrice(commodity);
-    var sum = co_price * amount;
+    // get the price & can we buy this much?
+    var priceStatus = city.getCommoditySalePrice(commodity, amount);
+    if(!priceStatus.success) return priceStatus;
+
+    // does the player have money?
+    var sum = priceStatus.message * amount;
     if(player.money < sum ) return {success: false, message: 'Not enough money'};
 
-    player.money -= sum;
-    var addStatus = aircraft.addCargo(commodity, amount, co_price);
+    // try to add it to the aircraft
+    var addStatus = aircraft.addCargo(commodity, amount, priceStatus.message);
     if(!addStatus.success) return addStatus;
+
+    // take it from the city
+    city.market.get(commodity.id).amount -= amount;
+
+    // all done, deduct the money & return
+    player.money -= sum;
     return {success: true, message: 'Purchase successful'};
 }
 
 function sellCommodity(commodity, amount){
+
+    // check variables
     if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+
+    // get required variables
     var player = PLAYERS.get(server_data.player_settings.id);
     var aircraft = player.getAircraft();
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to sell commodities'};
 
-    var co_price = city.getCommodityBuyPrice(commodity);
+    // get the price & can we sell this much?
+    var priceStatus = city.getCommodityBuyPrice(commodity);
+    if(!priceStatus.success) return priceStatus;
+
+    // try to take it from the aircraft
     var cargoStatus = aircraft.takeCargo(commodity, amount);
     if(!cargoStatus.success) return cargoStatus;
-    player.money += amount * co_price;
+
+    // add it to the city
+    city.market.get(commodity.id).amount += amount;
+
+    // all done, deduct the money & return
+    player.money += amount * priceStatus.message;
     return {success: true, message: 'Sale successful'};
 }
 

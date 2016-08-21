@@ -243,3 +243,7 @@ function getPriceModifier(orig_amount, orig_required){
     if(modifier > 2) modifier = 2;
     return modifier;
 }
+
+function getCommodityPrice(amount, required, base_price){
+    return Math.round(getPriceModifier(amount, required) * base_price *100)/100;
+}

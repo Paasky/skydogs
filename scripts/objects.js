@@ -159,10 +159,13 @@ function City(id, name, country_id, population, position) {
     
     this.getCountry = function(){ return COUNTRIES.get(country_id) };
     this.getCommodityBuyPrice = function(commodity){
-        return commodity.base_price*0.9;
+        return { success: true, message: this.market.get(commodity.id).price * 0.9 };
     }
-    this.getCommoditySalePrice = function(commodity){
-        return commodity.base_price*1.1;
+    this.getCommoditySalePrice = function(commodity, amount){
+        if(amount && this.market.get(commodity.id).amount < amount){
+            return { success: false, message: 'City does not have enough in stock' };
+        }
+        return { success: true, message: this.market.get(commodity.id).price * 1.1 };
     }
 }
 

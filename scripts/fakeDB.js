@@ -4227,7 +4227,7 @@ function getDB(){
     // create commodities data
     commodities_raw.forEach(function(c){
         // each commodity is worth 10x more than IRL, but is also required 1/10th of IRL
-        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, c.base_cost*10, c.req_per_pop/10, c.req_cargo_id, c.req_cargo_mod) );
+        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, Math.round(c.base_cost*10*100)/100, c.req_per_pop/10, c.req_cargo_id, c.req_cargo_mod) );
     });
     
     // create city data
@@ -4251,7 +4251,7 @@ function getDB(){
             var amount = Math.round(required * (Math.random()*3+3) );
 
             // set the market price
-            var price = Math.round(getPriceModifier(amount, required) * co.base_price *100)/100;
+            var price = getCommodityPrice(amount, required, co.base_price);
 
             // add this commodity to the market of this city
             CITIES.get(c.id).market.set({ id: co.id, amount: amount, required: required, price: price });
@@ -4262,10 +4262,11 @@ function getDB(){
         productions.forEach(function(co){
 
             // produce 1/10th of IRL
-            CITIES.get(c.id).market.get(co.cargo_id).production = co.amount / 10;
+            var production = Math.round(co.amount / 10);
+            CITIES.get(c.id).market.get(co.cargo_id).production = production;
 
-            // add more to the market, again 1/10th of IRL
-            CITIES.get(c.id).market.get(co.cargo_id).amount += Math.round(co.amount * (Math.random()*3+3) / 10);
+            // add more to the market
+            CITIES.get(c.id).market.get(co.cargo_id).amount += Math.round(production * (Math.random()*4+2));
         });
 
         // set amounts for cotton (1) & tobacco (2)

@@ -56,7 +56,7 @@ getDB();
 
 var server = {
     ai: {
-        anwhereAI: function(p){
+        anywhereAI: function(p){
             var a = p.getAircraft();
             
             // if the player isn't going anywhere
@@ -127,7 +127,7 @@ var server = {
                 //do we know where the ai is?
                 var currentCity = CITIES.get(a.position.id);
                 if(!currentCity){
-                    server.ai.anwhereAI(p);
+                    server.ai.anywhereAI(p);
                     return;
                 }
                 // if the current player is sleeping in the city
@@ -179,7 +179,7 @@ var server = {
                     var city = CITIES.get(bestProfit.id);
                     if(!city){
                         console.log('merchantAI ('+p.id+'): no profitable route found, try our luck elsewhere');
-                        server.ai.anwhereAI(p);
+                        server.ai.anywhereAI(p);
                         return;
                     }
 

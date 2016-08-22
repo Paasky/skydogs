@@ -63,6 +63,7 @@ var server = {
             if(a.destination.type=="none" && p.ai){
                 // is the AI marked for deletion
                 if(p.deleteAI){
+                    console.log('deleting AI ('+a.id+')');
                     AIRCRAFTS.deleteById(a.id);
                     PLAYERS.deleteById(p.id);
                     return;
@@ -78,14 +79,20 @@ var server = {
                     var closestCity = {dist: 9999999, id:0};
                     CITIES.forEach(function(city){
                         var range = hasRange(a, city.position);
-                        if(range.status && range.dist.km > 10) citiesInRange.push(city.id);
-                        if(range.dist.km < closestCity.dist){
+                        if(range.dist.km > 1 && range.dist.km < closestCity.dist){
                             closestCity.dist = range.dist.km;
                             closestCity.id = city.id;
                         }
+                        if(!range.success) return;
+                        if(range.dist.km > 50) citiesInRange.push(city.id);
                     });
                     
                     var rand_id = closestCity.id;
+                    if(rand_id==0){
+                        console.log('anywhereAI ('+p.id+'): could not find any cities to fly to, marking for deletion');
+                        p.deleteAI=true;
+                        return;
+                    }
                     if(citiesInRange.length > 0){
                         // select a random city
                         rand_id = citiesInRange[Math.floor(Math.random()*citiesInRange.length)];
@@ -111,7 +118,7 @@ var server = {
 
                 // is the AI marked for deletion
                 if(p.deleteAI){
-                    console.log('deleting AI '+a.id);
+                    console.log('deleting AI ('+a.id+')');
                     AIRCRAFTS.deleteById(a.id);
                     PLAYERS.deleteById(p.id);
                     return;
@@ -173,10 +180,9 @@ var server = {
                     if(!city){
                         if(!p.supersleeps) p.supersleeps=0;
                         p.supersleeps++;
-                        if(p.supersleeps>5){
-                            console.log('merchantAI ('+p.id+'): no profitable route found for the '+p.supersleeps+'. time, mark for deletion');
-                            p.deleteAI=true;
-                            p.sleep=0;
+                        if(p.supersleeps>1){
+                            console.log('merchantAI ('+p.id+'): no profitable route found for the '+p.supersleeps+'. time, try our luck elsewhere');
+                            server.ai.anwhereAI(p);
                             return;
                         } else {
                             console.log('merchantAI ('+p.id+'): no profitable route found! Sleeping for a superTick, '+p.supersleeps+'. time');

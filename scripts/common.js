@@ -21,6 +21,9 @@ function tick(aircrafts, tick_length){
 
             // if the distance left to travel is same or smaller than the distance the player will travel
             } else {
+                var dist_travelled = getDistances(a.position, a.destination);
+                a.fuel.amount -= a.fuel.consumption*dist_travelled.km;
+
                 arrivedAircraft.push(a);
                 // set player position to the destination, hide the route path, and set info box to 0
                 a.position = cloneObject(a.destination);

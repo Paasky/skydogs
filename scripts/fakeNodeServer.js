@@ -13,8 +13,8 @@ var server_data = {
         // geo_per_kmh: 0.1,
         geo_per_kmh: 0.5,
         ai_sleep: 10,
-        tick_length: 500,
-        super_tick_length: 100,
+        tick_length: 1000, // 1000ms, 1 sec
+        super_tick_length: 60, // 60*tick_length, 1 min
         
         z_index: {
             border: 10,
@@ -143,8 +143,8 @@ var server = {
                     CITIES.forEach(function(checkCity){
                         var range = hasRange(a, checkCity.position);
 
-                        // not in range -> don't bother
-                        if(!range.success) return;
+                        // not in range or really close -> don't bother
+                        if(!range.success || range.dist.km < 10) return;
 
                         // loop through each commodity
                         COMMODITIES.forEach(function(co){
@@ -178,19 +178,10 @@ var server = {
 
                     var city = CITIES.get(bestProfit.id);
                     if(!city){
-                        if(!p.supersleeps) p.supersleeps=0;
-                        p.supersleeps++;
-                        if(p.supersleeps>1){
-                            console.log('merchantAI ('+p.id+'): no profitable route found for the '+p.supersleeps+'. time, try our luck elsewhere');
-                            server.ai.anwhereAI(p);
-                            return;
-                        } else {
-                            console.log('merchantAI ('+p.id+'): no profitable route found! Sleeping for a superTick, '+p.supersleeps+'. time');
-                            p.sleep = server_data.game_settings.super_tick_length;
-                            return;
-                        }
+                        console.log('merchantAI ('+p.id+'): no profitable route found, try our luck elsewhere');
+                        server.ai.anwhereAI(p);
+                        return;
                     }
-                    p.supersleeps=0;
 
                     // buy the stuff
                     var purchaseStatus = buyCommodity(a, bestProfit.co, amount);
@@ -227,6 +218,9 @@ var server = {
                 var refuelStatus = refuel(a);
                 if(refuelStatus.success){
                     console.log('AI ('+p.id+') refueled for $'+refuelStatus.message.price);
+                    if(refuelStatus.message.price<1){
+                        console.log('tiny refuel, whats going on?');
+                    }
                 } else {
                     console.log('AI ('+p.id+') could not refuel ('+refuelStatus.message+'), marking for deletion');
                     p.deleteAI=true;
@@ -263,7 +257,7 @@ var server = {
         });
 
         // checkAI
-        var AIlimit = 50;
+        var AIlimit = 100;
 
         // mark extra AI players for deletion
         if(PLAYERS.ids.length > AIlimit){
@@ -272,11 +266,42 @@ var server = {
                 if(!p.ai || toRemove==0) return;
                 p.deleteAI = true;
                 toRemove--;
+                console.log('Too many players, marking AI ('+p.id+') for deletion');
             });
 
         // create new AI's
         } else {
+            while(PLAYERS.ids.length < AIlimit){
+                var city = CITIES.get(CITIES.ids[ Math.floor(Math.random()*CITIES.ids.length) ]);
 
+                var destination = { id:0, lat:0, lng:0, type:'none' };
+                var position = city.position;
+                position.id = city.id;
+
+                var fuel = { amount: 100, max: 100, consumption: 0.35 };
+
+                var p_name =    playerNames[0][Math.floor(Math.random()*playerNames[0].length)]+
+                                ' '+
+                                playerNames[1][Math.floor(Math.random()*playerNames[1].length)];
+
+                var a_name = '';
+                if(Math.round(Math.random()) == 0){
+                    a_name = aircraftNames[0][Math.floor(Math.random()*aircraftNames[0].length)];
+                } else {
+                    a_name =
+                        aircraftNames[1][0][Math.floor(Math.random()*aircraftNames[1][0].length)]+
+                        ' '+
+                        aircraftNames[1][1][Math.floor(Math.random()*aircraftNames[1][1].length)];
+                }
+
+                var playerId = getFirstFreePlayerId();
+                var aircraftId = getFirstFreeAircraftId();
+
+                PLAYERS.set( new Player(playerId, p_name, true, Math.round(Math.random()*100)+450, aircraftId) );
+                AIRCRAFTS.set( new Aircraft(aircraftId, a_name, fuel, 360, position, destination, playerId) );
+
+                console.log('Added new AI ('+playerId+') with aircraft #'+aircraftId);
+            }
         }
     },
 };
@@ -346,7 +371,7 @@ function setDestination(type, id){
     }
     
     var range = hasRange(aircraft, new_dest, aircraft.speed);
-    if(range.status){
+    if(range.success){
         aircraft.destination = new_dest;
         aircraft.destination.type = type;
         aircraft.destination.id = id;
@@ -386,7 +411,7 @@ function buyCommodity(aircraft, commodity, amount){
     city.market.get(commodity.id).amount -= amount;
 
     // all done, deduct the money & return
-    player.money -= sum;
+    player.money = getMoney(player.money - sum);
     return {success: true, message: { price: sum }};
 }
 
@@ -417,7 +442,7 @@ function sellCommodity(aircraft, commodity, amount){
     var price = getMoney(amount * priceStatus.message);
 
     // all done, add the money & return
-    player.money += price;
+    player.money = getMoney(player.money + price);
 
     var message = { price: price };
     if(origValue){
@@ -440,7 +465,7 @@ function refuel(aircraft, amount){
     var sum = getMoney(priceReply.message * amount);
     if(player.money < sum ) return {success: false, message: 'Not enough money'};
 
-    player.money -= sum;
+    player.money = getMoney(player.money - sum);
     aircraft.fuel.amount += amount;
     return {success: true, message: { amount: amount, price: sum }};
 }

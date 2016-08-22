@@ -95,7 +95,7 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
                 var c = amount;
                 var d = purchasePrice;
                 var newValuePerItem = (a*b + c*d) / (a + c);
-                currentCommodity.valuePerItem = newValuePerItem;
+                currentCommodity.valuePerItem = getMoney(newValuePerItem);
             }
             currentCommodity.amount += amount;
         } else {

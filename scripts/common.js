@@ -25,7 +25,7 @@ function tick(aircrafts, tick_length){
                 // set player position to the destination, hide the route path, and set info box to 0
                 a.position = cloneObject(a.destination);
                 a.destination.type = 'none';
-                p.sleep=server_data.game_settings.ai_sleep;
+                if(p.ai) p.sleep=server_data.game_settings.ai_sleep;
             }
         }
     });
@@ -245,11 +245,17 @@ function getPriceModifier(orig_amount, orig_required){
 }
 
 function getCommodityPrice(amount, required, base_price){
-    if(amount<=0 && required<=0) return Math.round(0.5 * base_price *100)/100;
-    return Math.round(getPriceModifier(amount, required) * base_price *100)/100;
+    if(amount<=0 && required<=0) return getMoney(0.5 * base_price);
+    return getMoney(getPriceModifier(amount, required) * base_price);
 }
 
 function getCostPerKm(aircraft){
     // 18 = fuel
     return COMMODITIES.get(18).base_price * aircraft.fuel.consumption
+}
+
+function getMoney(amount, asString){
+    var roundedAmount = Math.round(amount*100)/100;
+    if(asString) return '$'+roundedAmount;
+    return roundedAmount;
 }

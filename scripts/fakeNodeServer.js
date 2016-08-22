@@ -164,6 +164,7 @@ var server = {
                             if(bestProfit.profit < routeProfit){
                                 bestProfit.profit = routeProfit;
                                 bestProfit.id = checkCity.id;
+                                bestProfit.co = co;
                             }
                         });
                     });
@@ -184,6 +185,11 @@ var server = {
                         }
                     }
                     p.supersleeps=0;
+
+                    // buy the stuff
+                    var purchaseStatus = buyCommodity(a, bestProfit.co, amount);
+                    if(!purchaseStatus.success) return purchaseStatus;
+
                     console.log('merchantAI ('+p.id+'): heads for '+city.name+' for $'+Math.round(bestProfit.profit)+' profit!');
                     a.destination = cloneObject(city.position);
                     a.destination.type = "city";
@@ -202,7 +208,26 @@ var server = {
             server.ai.merchantAI(p);
         });
         arrivedAircraft.forEach(function(a){
-            a.fuel.amount = a.fuel.max;
+            var p = a.getPlayer();
+            // arrived aircraft might have disappeared from the game
+            if(!a || !p) return;
+            if(p.ai){
+                a.cargoHold.forEach(function(co){
+                    var saleStatus = sellCommodity(a, co, co.amount);
+                    if(!saleStatus.success) return saleStatus;
+                    console.log('AI ('+p.id+') made a profit of $'+saleStatus.message.profit);
+                });
+
+                var refuelStatus = refuel(a);
+                if(refuelStatus.success){
+                    console.log('AI ('+p.id+') refueled for $'+refuelStatus.message.price);
+                } else {
+                    console.log('AI ('+p.id+') could not refuel ('+refuelStatus.message+'), marking for deletion');
+                    p.deleteAI=true;
+                    p.sleep=0;
+                }
+
+            }
             if(game_data.AIRCRAFTS.get(a.id)){
                 $(document).trigger('cityArrive', a.id);
             }
@@ -329,23 +354,22 @@ function setDestination(type, id){
     }
 }
 
-function buyCommodity(commodity, amount){
+function buyCommodity(aircraft, commodity, amount){
 
     // check variables
-    if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+    if(!aircraft || !commodity || !amount) return {success: false, message: 'aircraft, commodity and amount are required'};
 
     // get required variables
-    var player = PLAYERS.get(server_data.player_settings.id);
-    var aircraft = player.getAircraft();
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to buy commodities'};
+    var player = aircraft.getPlayer;
 
     // get the price & can we buy this much?
     var priceStatus = city.getCommoditySalePrice(commodity, amount);
     if(!priceStatus.success) return priceStatus;
 
     // does the player have money?
-    var sum = priceStatus.message * amount;
+    var sum = getMoney(priceStatus.message * amount);
     if(player.money < sum ) return {success: false, message: 'Not enough money'};
 
     // try to add it to the aircraft
@@ -357,23 +381,26 @@ function buyCommodity(commodity, amount){
 
     // all done, deduct the money & return
     player.money -= sum;
-    return {success: true, message: 'Purchase successful'};
+    return {success: true, message: { price: sum }};
 }
 
-function sellCommodity(commodity, amount){
+function sellCommodity(aircraft, commodity, amount){
 
     // check variables
-    if(!commodity || !amount) return {success: false, message: 'commodity and amount are required'};
+    if(!aircraft || !commodity || !amount) return {success: false, message: 'aircraft, commodity and amount are required'};
 
     // get required variables
-    var player = PLAYERS.get(server_data.player_settings.id);
-    var aircraft = player.getAircraft();
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to sell commodities'};
+    var player = aircraft.getPlayer();
 
     // get the price & can we sell this much?
     var priceStatus = city.getCommodityBuyPrice(commodity);
     if(!priceStatus.success) return priceStatus;
+
+    // get the origValue if it's there
+    var origValue = false;
+    if(commodity.valuePerItem) origValue = getMoney(amount * commodity.valuePerItem);
 
     // try to take it from the aircraft
     var cargoStatus = aircraft.takeCargo(commodity, amount);
@@ -381,29 +408,35 @@ function sellCommodity(commodity, amount){
 
     // add it to the city
     city.market.get(commodity.id).amount += amount;
+    var price = getMoney(amount * priceStatus.message);
 
-    // all done, deduct the money & return
-    player.money += amount * priceStatus.message;
-    return {success: true, message: 'Sale successful'};
+    // all done, add the money & return
+    player.money += price;
+
+    var message = { price: price };
+    if(origValue){
+        message.origValue = origValue;
+        message.profit = getMoney(price-origValue);
+    }
+    return {success: true, message: message };
 }
 
-function refuel(amount){
-    if(!amount) return {success: false, message: 'amount is required'};
-    var player = PLAYERS.get(server_data.player_settings.id);
-    var aircraft = player.getAircraft();
+function refuel(aircraft, amount){
+    if(!aircraft) return {success: false, message: 'aircraft is required'};
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to refuel'};
+    var player = aircraft.getPlayer();
 
-    if(amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
+    if(! amount || amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
 
     var priceReply = city.getCommoditySalePrice(COMMODITIES.get(18)); // 18 = fuel
     if(!priceReply.success) return priceReply;
-    var sum = priceReply.message * amount;
+    var sum = getMoney(priceReply.message * amount);
     if(player.money < sum ) return {success: false, message: 'Not enough money'};
 
     player.money -= sum;
     aircraft.fuel.amount += amount;
-    return {success: true, message: 'Refuel successful'};
+    return {success: true, message: { amount: amount, price: sum }};
 }
 
 function refuelFromCargoHold(amount){

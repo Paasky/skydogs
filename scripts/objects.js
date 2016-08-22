@@ -123,13 +123,14 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
 
         // do we even have that commodity?
         if(!cargoHoldCommodity) return { success: false, message: 'Cargo Hold does not have this commodity' };
-
-        if(!amount) return { success: true, message: cargoHoldCommodity };
-
         if(cargoHoldCommodity.amount <= 0){
             this.cargoHold.deleteById(commodity.id);
             return { success: false, message: 'Cargo Hold does not have this commodity' };
         }
+
+        // if the amount wasn't asked for
+        if(!amount) return { success: true, message: cargoHoldCommodity };
+
 
         // do we have enough of the commodity?
         if(cargoHoldCommodity.amount < amount) return { success: false, message: 'Cargo Hold does not that much of this commodity' };

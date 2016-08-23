@@ -104,9 +104,7 @@ var server = {
                     a.destination = cloneObject(city.position);
                     a.destination.type = "city";
                     a.destination.id = rand_id;
-                    if(game_data.AIRCRAFTS.get(a.id)){
-                        $(document).trigger('cityLeave', a.id);
-                    }
+                    if(game_data.AIRCRAFTS.get(a.id)) $(document).trigger('cityLeave', a.id);
                 }
             }
         },
@@ -226,16 +224,12 @@ var server = {
                     p.deleteAI=true;
                     p.sleep=0;
                 }
-
             }
             if(game_data.AIRCRAFTS.get(a.id)){
                 $(document).trigger('cityArrive', a.id);
             }
         });
-        if(tickCounter>server_data.game_settings.super_tick_length){
-            tickCounter=0;
-            server.superTick();
-        }
+        if(tickCounter % server_data.game_settings.super_tick_length == 0) server.superTick();
         tickCounter++;
     },
     superTick: function(){
@@ -266,6 +260,7 @@ var server = {
                     production: co.production,
                     price: co.price,
                     modifier: priceReply.modifier,
+                    tick: tickCounter,
                 });
 
                 // adjust production & usage
@@ -358,7 +353,7 @@ var server = {
         }
     },
 };
-var tickCounter = server_data.game_settings.super_tick_length;
+var tickCounter = 0;
 var serverTicker = setInterval(server.tick, server_data.game_settings.tick_length);
 
 
@@ -412,8 +407,7 @@ function updateGameData(){
 updateGameData(PLAYERS.get(server_data.player_settings.id));
 
 
-function setDestination(type, id){
-    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+function setDestination(aircraft, type, id){
     var new_dest;
     
     if(type=='city'){
@@ -428,14 +422,18 @@ function setDestination(type, id){
         aircraft.destination = new_dest;
         aircraft.destination.type = type;
         aircraft.destination.id = id;
-        $(document).trigger('cityLeave', aircraft.id);
-        return {success: true, message: 'Up up and away!'};;
+        if(game_data.AIRCRAFTS.get(aircraft.id)) $(document).trigger('cityLeave', aircraft.id);
+        return {success: true, message: 'Up up and away!'};
     } else {
         return {
             success: false,
             message: 'Not enough range! Current range: '+range.range_km+' km, distance: '+Math.round(range.dist.km)+' km'
         };
     }
+}
+function userSetDestination(type, id){
+    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+    return setDestination(aircraft, type, id)
 }
 
 function buyCommodity(aircraft, commodity, amount){
@@ -446,7 +444,7 @@ function buyCommodity(aircraft, commodity, amount){
     // get required variables
     var city = CITIES.get(aircraft.position.id);
     if(!city) return {success: false, message: 'Land in a city before trying to buy commodities'};
-    var player = aircraft.getPlayer;
+    var player = aircraft.getPlayer();
 
     // get the price & can we buy this much?
     var priceStatus = city.getCommoditySalePrice(commodity, amount);
@@ -466,6 +464,10 @@ function buyCommodity(aircraft, commodity, amount){
     // all done, deduct the money & return
     player.money = getMoney(player.money - sum);
     return {success: true, message: { price: sum }};
+}
+function userSellCommodity(commodity, amount){
+    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+    return buyCommodity(aircraft, commodity, amount);
 }
 
 function sellCommodity(aircraft, commodity, amount){
@@ -504,6 +506,10 @@ function sellCommodity(aircraft, commodity, amount){
     }
     return {success: true, message: message };
 }
+function userSellCommodity(commodity, amount){
+    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+    return sellCommodity(aircraft, commodity, amount);
+}
 
 function refuel(aircraft, amount){
     if(!aircraft) return {success: false, message: 'aircraft is required'};
@@ -522,16 +528,23 @@ function refuel(aircraft, amount){
     aircraft.fuel.amount += amount;
     return {success: true, message: { amount: amount, price: sum }};
 }
+function userRefuel(amount){
+    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+    return refuel(aircraft, amount);
+}
 
-function refuelFromCargoHold(amount){
-    if(!amount) return {success: false, message: 'amount is required'};
-    var player = PLAYERS.get(server_data.player_settings.id);
-    var aircraft = player.getAircraft();
+function refuelFromCargoHold(aircraft, amount){
+    if(!aircraft) return {success: false, message: 'aircraft is required'};
+    var player = aircraft.getPlayer();
 
-    if(amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
+    if(! amount || amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
 
     var cargoStatus = aircraft.takeCargo(COMMODITIES.get(18), amount);
     if(!cargoStatus.success) return cargoStatus;
     aircraft.fuel.amount += amount;
     return {success: true, message: 'Refuel successful'};
+}
+function userRefuelFromCargoHold(amount){
+    var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
+    return refuelFromCargoHold(aircraft, amount);
 }

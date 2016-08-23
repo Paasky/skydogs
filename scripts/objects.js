@@ -70,6 +70,8 @@ function ObjectHolder(){
     }
 }
 
+var MARKETHISTORY = [];
+
 
 
 var AIRCRAFTS = new ObjectHolder();
@@ -151,14 +153,17 @@ function Country(id, name, flag_file, color1, color2, is_dry) {
 
 
 var CITIES = new ObjectHolder();
-function City(id, name, country_id, population, position) {
+function City(id, name, state_id, country_id, population, position) {
     this.id = id;
     this.name = name;
     this.population = population;
     this.position = position;
+    this.state_id = state_id;
+    this.country_id = country_id;
     this.market = new ObjectHolder();
     
-    this.getCountry = function(){ return COUNTRIES.get(country_id) };
+    this.getState = function(){ return this.state_id };
+    this.getCountry = function(){ return COUNTRIES.get(this.country_id) };
     this.getCommodityBuyPrice = function(commodity, amount){
         var price = this.market.get(commodity.id).price * 0.9;
         return { success: true, message: price };

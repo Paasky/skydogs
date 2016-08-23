@@ -248,8 +248,9 @@ function getPriceModifier(orig_amount, orig_required){
 }
 
 function getCommodityPrice(amount, required, base_price){
-    if(amount<=0 && required<=0) return getMoney(0.5 * base_price);
-    return getMoney(getPriceModifier(amount, required) * base_price);
+    var modifier = 0.5;
+    if(amount>0 && required>0) getPriceModifier(amount, required);
+    return { modifier: modifier, price: getMoney( modifier * base_price) };
 }
 
 function getCostPerKm(aircraft){

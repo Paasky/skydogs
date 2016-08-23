@@ -252,7 +252,60 @@ var server = {
                 co.amount = Math.round(amount);
 
                 // set the market price
-                co.price = getCommodityPrice(co.amount, co.required, COMMODITIES.get(co.id).base_price);
+                var priceReply = getCommodityPrice(co.amount, co.required, COMMODITIES.get(co.id).base_price);
+                co.price = priceReply.price;
+
+                // one for the history books
+                MARKETHISTORY.push({
+                    commodity: co.id,
+                    country: c.country_id,
+                    state: c.state_id,
+                    city: c.id,
+                    amount: co.amount,
+                    required: co.required,
+                    production: co.production,
+                    price: co.price,
+                    modifier: priceReply.modifier,
+                });
+
+                // adjust production & usage
+                if(co.required > 0){
+                    var changePercent = 5;
+                    if(priceReply.modifier <= 0.5 || priceReply.modifier >= 2) changePercent = 10;
+
+                    // if modifier is low, there's too much in storage
+                    if(priceReply.modifier < 0.6){
+                        var log = c.name+' has too much '+COMMODITIES.get(co.id).name+', adjusting: ';
+
+                        // if it's produced, lower the production
+                        if(co.production > 0 ){
+                            co.production = Math.round(co.production * ( (100-changePercent) / 100 ) );
+                            log+='prod -'+changePercent+'%, ';
+
+                        // not produced, so increase consumption by x2
+                        } else { changePercent *= 2; }
+                        co.required = Math.round(co.required * ( (100+changePercent) / 100 ) );
+                        log+='usage +'+changePercent+'%';
+
+                        console.log(log);
+
+                    // if modifier is high, there's too little in storage
+                    } else if(priceReply.modifier > 1.8){
+                        var log = c.name+' has too little '+co.name+', adjusting: ';
+
+                        // if it's produced, increase the production
+                        if(co.production > 0 ){
+                            co.production = Math.round(co.production * ( (100+changePercent) / 100 ) );
+                            log+='prod +'+changePercent+'%, ';
+
+                        // not produced, so lower consumption by x2
+                        } else { changePercent *= 2; }
+                        co.required = Math.round(co.required * ( (100-changePercent) / 100 ) );
+                        log+='usage -'+changePercent+'%';
+
+                        console.log(log);
+                    }
+                }
             });
         });
 
@@ -275,7 +328,7 @@ var server = {
                 var city = CITIES.get(CITIES.ids[ Math.floor(Math.random()*CITIES.ids.length) ]);
 
                 var destination = { id:0, lat:0, lng:0, type:'none' };
-                var position = city.position;
+                var position = cloneObject(city.position);
                 position.id = city.id;
 
                 var fuel = { amount: 100, max: 100, consumption: 0.35 };

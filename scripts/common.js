@@ -263,3 +263,85 @@ function getMoney(amount, asString){
     if(asString) return '$'+roundedAmount;
     return roundedAmount;
 }
+
+
+var analyzeMarketHistory = {
+    /* MARKETHISTORY (array)
+    Each entry is the details of one commodity in one city at one supertick.
+    Records are written after the city consumes/produces the commodities and
+    the prices have been recalculated. Production & consumption values are
+    modified after writing the entry.
+    
+    Contents: {
+        amount: amount of commodity in the city
+        city: id of city
+        commodity: id of commodity
+        country: id of country
+        modifier: price modifier of the commodity
+        price: price of the commodity
+        production: amount produced per supertick *can be undefined*
+        required: amount consumed per supertick
+        state: id of the state
+        tick: time of recording
+    } */
+    
+    CommodityName_Tick_TotalAmount: function(){
+        var commodities = {};
+        MARKETHISTORY.forEach(function(h){
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!commodities[name]) commodities[name] = {};
+            var commodity = commodities[name];
+            
+            // set up tick
+            if(!commodity[h.tick]) commodity[h.tick] = 0;
+            
+            // add amount
+            commodity[h.tick] += h.amount;
+        });
+        
+        return commodities;
+    },
+    CommodityName_Tick_Production: function(){
+        var commodities = {};
+        MARKETHISTORY.forEach(function(h){
+            if(!h.production) return;
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!commodities[name]) commodities[name] = {};
+            var commodity = commodities[name];
+            
+            // set up tick
+            if(!commodity[h.tick]) commodity[h.tick] = 0;
+            
+            // add amount
+            commodity[h.tick] += h.production;
+        });
+        
+        return commodities;
+    },
+    Tick_CommodityName_Amount: function(){
+        var ticks = {};
+        MARKETHISTORY.forEach(function(h){
+            
+            // set up ticks
+            if(!ticks[h.tick]) ticks[h.tick] = {};
+            var tick = ticks[h.tick];
+            
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!tick[name]) tick[name] = 0;
+            
+            // add amount
+            tick[name] += h.amount;
+        });
+        
+        return ticks;
+    },
+};

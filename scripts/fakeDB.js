@@ -6925,7 +6925,7 @@ function getDB(){
         };
         p.speed = 360;
         
-        PLAYERS.set( new Player(parseInt(p.id), p.name, isTrue(p.ai), Math.round(Math.random()*100)+450, p.id) );
+        PLAYERS.set( new Player(parseInt(p.id), p.name, isTrue(p.ai), Math.round(Math.random()*50)+100, p.id) );
         var a_name = '';
         if(Math.round(Math.random()) == 0){
             a_name = aircraftNames[0][Math.floor(Math.random()*aircraftNames[0].length)];

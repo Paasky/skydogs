@@ -215,7 +215,6 @@ var server = {
 
                 var refuelStatus = refuel(a);
                 if(refuelStatus.success){
-                    console.log('AI ('+p.id+') refueled for $'+refuelStatus.message.price);
                     if(refuelStatus.message.price<1){
                         console.log('tiny refuel, whats going on?');
                     }
@@ -345,7 +344,7 @@ var server = {
                 var playerId = getFirstFreePlayerId();
                 var aircraftId = getFirstFreeAircraftId();
 
-                PLAYERS.set( new Player(playerId, p_name, true, Math.round(Math.random()*100)+450, aircraftId) );
+                PLAYERS.set( new Player(playerId, p_name, true, Math.round(Math.random()*50)+100, aircraftId) );
                 AIRCRAFTS.set( new Aircraft(aircraftId, a_name, fuel, 360, position, destination, playerId) );
 
                 console.log('Added new AI ('+playerId+') with aircraft #'+aircraftId);

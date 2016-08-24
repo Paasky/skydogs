@@ -282,8 +282,6 @@ var server = {
                         co.required = Math.round(co.required * ( (100+changePercent) / 100 ) );
                         logs += 'usage +'+changePercent+'%\n';
 
-                        console.log(log);
-
                     // if modifier is high, there's too little in storage
                     } else if(priceReply.modifier > 1.8){
                         logs = c.name+' has too little '+co.name+', adjusting: ';

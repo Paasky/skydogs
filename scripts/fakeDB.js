@@ -6836,7 +6836,7 @@ function getDB(){
     // create commodities data
     commodities_raw.forEach(function(c){
         // each commodity is worth 10x more than IRL, but is also required 1/10th of IRL
-        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, Math.round(c.base_cost*100)/100, c.req_per_pop/10, c.req_cargo_id, c.req_cargo_mod) );
+        COMMODITIES.set( new Commodity(c.id, c.name, c.unit, c.units, c.weight, getMoney(c.base_cost), c.req_per_pop/10, c.req_cargo_id, c.req_cargo_mod) );
     });
     
     // create city data
@@ -6873,9 +6873,6 @@ function getDB(){
             // produce 1/10th of IRL
             var production = Math.round(co.amount / 10);
             CITIES.get(c.id).market.get(co.cargo_id).production = production;
-
-            // add more to the market
-            CITIES.get(c.id).market.get(co.cargo_id).amount += Math.round(production * (Math.random()*4+2));
         });
 
         // set amounts for cotton (1) & tobacco (2)

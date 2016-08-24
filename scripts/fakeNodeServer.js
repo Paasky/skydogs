@@ -84,7 +84,9 @@ var server = {
                             closestCity.dist = range.dist.km;
                             closestCity.id = city.id;
                         }
-                        if(!range.success) return;
+                        // not in range or too close -> don't bother
+                        if(!range.success || range.dist.km < 10) return;
+
                         citiesInRange.push(city.id);
                     });
                     
@@ -140,8 +142,8 @@ var server = {
                     CITIES.forEach(function(checkCity){
                         var range = hasRange(a, checkCity.position);
 
-                        // not in range -> don't bother
-                        if(!range.success) return;
+                        // not in range or too close -> don't bother
+                        if(!range.success || range.dist.km < 10) return;
 
                         // loop through each commodity
                         COMMODITIES.forEach(function(co){
@@ -209,7 +211,6 @@ var server = {
                 a.cargoHold.forEach(function(co){
                     var saleStatus = sellCommodity(a, co, co.amount);
                     if(!saleStatus.success) return saleStatus;
-                    console.log('AI ('+p.id+') made a profit of $'+saleStatus.message.profit);
                 });
 
                 var refuelStatus = refuel(a);
@@ -234,6 +235,7 @@ var server = {
         console.log('supertick!');
 
         // recalc economy, for each commodity in each city.market
+        var logs = '';
         CITIES.forEach(function(c){
             c.market.forEach(function(co){
 
@@ -268,39 +270,38 @@ var server = {
 
                     // if modifier is low, there's too much in storage
                     if(priceReply.modifier < 0.6){
-                        var log = c.name+' has too much '+COMMODITIES.get(co.id).name+', adjusting: ';
+                        logs += c.name+' has too much '+COMMODITIES.get(co.id).name+', adjusting: ';
 
                         // if it's produced, lower the production
                         if(co.production > 0 ){
                             co.production = Math.round(co.production * ( (100-changePercent) / 100 ) );
-                            log+='prod -'+changePercent+'%, ';
+                            logs += 'prod -'+changePercent+'%, ';
 
                         // not produced, so increase consumption by x2
                         } else { changePercent *= 2; }
                         co.required = Math.round(co.required * ( (100+changePercent) / 100 ) );
-                        log+='usage +'+changePercent+'%';
+                        logs += 'usage +'+changePercent+'%\n';
 
                         console.log(log);
 
                     // if modifier is high, there's too little in storage
                     } else if(priceReply.modifier > 1.8){
-                        var log = c.name+' has too little '+co.name+', adjusting: ';
+                        logs = c.name+' has too little '+co.name+', adjusting: ';
 
                         // if it's produced, increase the production
                         if(co.production > 0 ){
                             co.production = Math.round(co.production * ( (100+changePercent) / 100 ) );
-                            log+='prod +'+changePercent+'%, ';
+                            logs += 'prod +'+changePercent+'%, ';
 
                         // not produced, so lower consumption by x2
                         } else { changePercent *= 2; }
                         co.required = Math.round(co.required * ( (100-changePercent) / 100 ) );
-                        log+='usage -'+changePercent+'%';
-
-                        console.log(log);
+                        logs += 'usage -'+changePercent+'%\n';
                     }
                 }
             });
         });
+        console.log(logs);
 
         // checkAI
         var AIlimit = 100;
@@ -461,6 +462,17 @@ function buyCommodity(aircraft, commodity, amount){
 
     // all done, deduct the money & return
     player.money = getMoney(player.money - sum);
+
+    CITYSALEHISTORY.push({
+        commodity: commodity.id,
+        amount: amount,
+        price: priceStatus.message,
+        country: city.country_id,
+        state: city.state_id,
+        city: city.id,
+        tick: tickCounter,
+    });
+
     return {success: true, message: { price: sum }};
 }
 function userSellCommodity(commodity, amount){
@@ -502,6 +514,18 @@ function sellCommodity(aircraft, commodity, amount){
         message.origValue = origValue;
         message.profit = getMoney(price-origValue);
     }
+
+    CITYBUYHISTORY.push({
+        commodity: commodity.id,
+        amount: amount,
+        price: priceStatus.message,
+        origPrice: origValue,
+        country: city.country_id,
+        state: city.state_id,
+        city: city.id,
+        tick: tickCounter,
+    });
+
     return {success: true, message: message };
 }
 function userSellCommodity(commodity, amount){

@@ -71,7 +71,8 @@ function ObjectHolder(){
 }
 
 var MARKETHISTORY = [];
-
+var CITYBUYHISTORY = [];
+var CITYSALEHISTORY = [];
 
 
 var AIRCRAFTS = new ObjectHolder();
@@ -172,7 +173,7 @@ function City(id, name, state_id, country_id, population, position) {
         if(amount && this.market.get(commodity.id).amount < amount){
             return { success: false, message: 'City does not have enough in stock' };
         }
-        var price = this.market.get(commodity.id).price * 1.1;
+        var price = getMoney(this.market.get(commodity.id).price * 1.1);
         return { success: true, message: price };
     }
 }

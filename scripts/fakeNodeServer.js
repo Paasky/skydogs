@@ -75,6 +75,7 @@ var server = {
                 // if the player is active, do stuff
                 } else {
                     
+                    // get the closest city & all cities in range
                     var citiesInRange = [];
                     var closestCity = {dist: 9999999, id:0};
                     CITIES.forEach(function(city){
@@ -84,7 +85,7 @@ var server = {
                             closestCity.id = city.id;
                         }
                         if(!range.success) return;
-                        if(range.dist.km > 50) citiesInRange.push(city.id);
+                        citiesInRange.push(city.id);
                     });
                     
                     var rand_id = closestCity.id;
@@ -93,11 +94,9 @@ var server = {
                         p.deleteAI=true;
                         return;
                     }
+                    // select a random city if there's one in range
                     if(citiesInRange.length > 0){
-                        // select a random city
                         rand_id = citiesInRange[Math.floor(Math.random()*citiesInRange.length)];
-                    } else {
-                        //console.log('MERCHANTAI ------------ Everything is too far away! Fallback to closest city.');
                     }
                     var city = CITIES.get(rand_id);
                     console.log('anywhereAI ('+p.id+'): heads for '+city.name);
@@ -141,8 +140,8 @@ var server = {
                     CITIES.forEach(function(checkCity){
                         var range = hasRange(a, checkCity.position);
 
-                        // not in range or really close -> don't bother
-                        if(!range.success || range.dist.km < 10) return;
+                        // not in range -> don't bother
+                        if(!range.success) return;
 
                         // loop through each commodity
                         COMMODITIES.forEach(function(co){

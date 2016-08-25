@@ -244,12 +244,12 @@ function getPriceModifier(orig_amount, orig_required){
     }
     if(modifier < 0.5) modifier = 0.5;
     if(modifier > 2) modifier = 2;
-    return modifier;
+    return getMoney(modifier);
 }
 
 function getCommodityPrice(amount, required, base_price){
     var modifier = 0.5;
-    if(amount>0 && required>0) getPriceModifier(amount, required);
+    if(required>0) modifier = getPriceModifier(amount, required);
     return { modifier: modifier, price: getMoney( modifier * base_price) };
 }
 
@@ -288,7 +288,7 @@ var analyzeMarketHistory = {
         tick: time of recording
     } */
     
-    CommodityName_Tick_TotalAmount: function(){
+    CommodityName_Tick_Amount: function(){
         var commodities = {};
         MARKETHISTORY.forEach(function(h){
             // get commodity name
@@ -327,6 +327,65 @@ var analyzeMarketHistory = {
         
         return commodities;
     },
+    CommodityName_Tick_Required: function(){
+        var commodities = {};
+        MARKETHISTORY.forEach(function(h){
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!commodities[name]) commodities[name] = {};
+            var commodity = commodities[name];
+            
+            // set up tick
+            if(!commodity[h.tick]) commodity[h.tick] = 0;
+            
+            // add amount
+            commodity[h.tick] += h.required;
+        });
+        
+        return commodities;
+    },
+    CommodityName_Tick_ProductionVsRequired: function(){
+        var commodities = {};
+        MARKETHISTORY.forEach(function(h){
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!commodities[name]) commodities[name] = {};
+            var commodity = commodities[name];
+            
+            // set up tick
+            if(!commodity[h.tick]) commodity[h.tick] = {p:0,r:0};
+            
+            // add amount
+            commodity[h.tick].r += h.required;
+            if(h.production) commodity[h.tick].p += h.production;
+        });
+        
+        return commodities;
+    },
+    CommodityName_Tick_Modifier: function(){
+        var commodities = {};
+        MARKETHISTORY.forEach(function(h){
+            if(!h.production) return;
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!commodities[name]) commodities[name] = {};
+            var commodity = commodities[name];
+            
+            // set up tick
+            if(!commodity[h.tick]) commodity[h.tick] = 0;
+            
+            // add amount
+            commodity[h.tick] += h.modifier;
+        });
+        
+        return commodities;
+    },
     Tick_CommodityName_Amount: function(){
         var ticks = {};
         MARKETHISTORY.forEach(function(h){
@@ -346,5 +405,55 @@ var analyzeMarketHistory = {
         });
         
         return ticks;
+    },
+    Tick_CommodityName_Modifier: function(){
+        var ticks = {};
+        MARKETHISTORY.forEach(function(h){
+            
+            // set up ticks
+            if(!ticks[h.tick]) ticks[h.tick] = {};
+            var tick = ticks[h.tick];
+            
+            // get commodity name
+            var name = COMMODITIES.get(h.commodity).name;
+            
+            // set up commodity
+            if(!tick[name]) tick[name] = 0;
+            
+            // add amount
+            tick[name] += h.modifier;
+        });
+        
+        return ticks;
+    },
+    Tick_ModifierCounts: function(){
+        var ticks = {};
+        MARKETHISTORY.forEach(function(h){
+            
+            // set up ticks
+            if(!ticks[h.tick]) ticks[h.tick] = {};
+            var tick = ticks[h.tick];
+            
+            // get modifier, rounded to 1st decimal
+            var modifier = Math.round(h.modifier*10)/10;
+            
+            // set up commodity
+            if(!tick[modifier]) tick[modifier] = 0;
+            
+            // add amount
+            tick[modifier] += 1;
+        });
+        
+        return ticks;
+    },
+    TotalImportExport: function(){
+        var values = {imports: 0, exports: 0};
+        CITYSALEHISTORY.forEach(function(h){
+            values.exports+=h.amount*h.price;
+        });
+        CITYBUYHISTORY.forEach(function(h){
+            values.imports+=h.amount*h.price;
+        });
+        return values;
     },
 };

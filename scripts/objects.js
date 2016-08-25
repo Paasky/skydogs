@@ -48,7 +48,7 @@ function ObjectHolder(){
     }
     
     this.reset = function(){
-        this.removeById(this.ids);
+        this.deleteById(this.ids);
     }
     
     this.resetWithObject = function(input){

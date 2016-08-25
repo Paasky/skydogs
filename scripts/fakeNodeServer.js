@@ -230,6 +230,7 @@ var server = {
         });
         if(tickCounter % server_data.game_settings.super_tick_length == 0) server.superTick();
         tickCounter++;
+        $(document).trigger('tickDone');
     },
     superTick: function(){
         console.log('supertick!');
@@ -248,6 +249,7 @@ var server = {
                 // set the market price
                 var priceReply = getCommodityPrice(co.amount, co.required, COMMODITIES.get(co.id).base_price);
                 co.price = priceReply.price;
+                co.modifier = priceReply.modifier;
 
                 // one for the history books
                 MARKETHISTORY.push({
@@ -348,6 +350,7 @@ var server = {
                 console.log('Added new AI ('+playerId+') with aircraft #'+aircraftId);
             }
         }
+        $(document).trigger('supertickDone');
     },
 };
 var tickCounter = 0;

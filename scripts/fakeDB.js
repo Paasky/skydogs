@@ -6857,7 +6857,7 @@ function getDB(){
             if(co.req_rural_only) required = Math.round(co.req_per_pop * c.pop.rural);
 
             // this city has this much of this commodity in stock
-            var amount = Math.round(required * (Math.random()*4+2) );
+            var amount = Math.round(required * (Math.random()*2+4) );
 
             // set the market price
             var price = getCommodityPrice(amount, required, co.base_price);
@@ -6878,9 +6878,9 @@ function getDB(){
         // set amounts for cotton (1) & tobacco (2)
         COMMODITIES.forEach(function(co){
             if(co.req_cargo_id){
-                var market_cargo = CITIES.get(c.id).market.get(1);
+                var market_cargo = CITIES.get(c.id).market.get(co.id);
                 if(market_cargo.production){
-                    market_cargo.amount = Math.round(market_cargo.production * co.req_cargo_mod * (Math.random()*3+3));
+                    market_cargo.amount = Math.round(market_cargo.production * co.req_cargo_mod * (Math.random()*2+4));
                 }
             }
         });

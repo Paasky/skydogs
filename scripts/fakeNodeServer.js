@@ -225,7 +225,7 @@ var server = {
                 }
             }
             if(game_data.AIRCRAFTS.get(a.id)){
-                $(document).trigger('cityArrive', a.id);
+                $(document).trigger('cityArrive', {aircraft_id: a.id, city_id: a.position.id});
             }
         });
         if(tickCounter % server_data.game_settings.super_tick_length == 0) server.superTick();
@@ -476,9 +476,10 @@ function buyCommodity(aircraft, commodity, amount){
 
     return {success: true, message: { price: sum }};
 }
-function userSellCommodity(commodity, amount){
+function userSellCommodity(commodity_id, amount){
+    var commodity = COMMODITIES.get(commodity_id);
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
-    return buyCommodity(aircraft, commodity, amount);
+    return sellCommodity(aircraft, commodity, amount);
 }
 
 function sellCommodity(aircraft, commodity, amount){

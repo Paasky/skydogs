@@ -9,6 +9,32 @@
             <div id="loading-message" class="full-size"><span>Loading <span id="loading-message-type">Libraries</span></span></div>
             <div ng-app="skyDogs" ng-controller="Ctrl" class="full-size">
                 <div id="map-canvas" class="full-size"></div>
+                <div id="cityScreen" class="full-size">
+                    <div id="cityScreen-container">
+                        <div id="cityScreenLeft">
+                            <div id="cityScreen-country">
+                                <img id="cityScreen-country-flag">
+                                <div id="cityScreen-country-name"></div>
+                            </div>
+                            <div id="cityScreen-marketBtn" class="cityScreen-btn">
+                                Market
+                                <div id="cityScreen-sellAllBtn" class="cityScreen-btn cityScreen-subBtn">Sell All</div>
+                            </div>
+                            <div id="cityScreen-hangarBtn" class="cityScreen-btn">
+                                Hangar
+                                <div id="cityScreen-refuelBtn" class="cityScreen-btn cityScreen-subBtn">Refuel</div>
+                            </div>
+                            <div id="cityScreen-cityhallBtn" class="cityScreen-btn">City Hall</div>
+                            <div id="cityScreen-speakeasyBtn" class="cityScreen-btn">Speakeasy</div>
+                            <div id="cityScreen-leaveBtn" class="cityScreen-btn">Leave city</div>
+                        </div>
+                        <div id="cityScreenRight">
+                            <div id="cityScreen-name"></div>
+                            <div id="cityScreen-pop">Pop. <span id="cityScreen-popNumber"></span></div>
+                            <div id="cityScreen-content"></div>
+                        </div>
+                    </div>
+                </div>
                 <div id="logger"></div>
                 <!--
                 First Name: <input type="text" ng-model="firstName"><br>

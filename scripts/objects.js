@@ -170,13 +170,13 @@ function City(id, name, state_id, country_id, population, position) {
     this.getState = function(){ return this.state_id };
     this.getCountry = function(){ return COUNTRIES.get(this.country_id) };
     this.getCommodityBuyPrice = function(commodity, amount){
-        if(!commodity || !amount) return {success: false, message: 'City.getCommodityBuyPrice(): commodity and amount are required'};
+        if(!commodity) return {success: false, message: 'City.getCommodityBuyPrice(): commodity is required'};
         
         var price = this.market.get(commodity.id).price * 0.9;
         return { success: true, message: price };
     }
     this.getCommoditySalePrice = function(commodity, amount){
-        if(!commodity || !amount) return {success: false, message: 'City.getCommoditySalePrice(): commodity and amount are required'};
+        if(!commodity) return {success: false, message: 'City.getCommoditySalePrice(): commodity is required'};
         
         if(amount && this.market.get(commodity.id).amount < amount){
             return { success: false, message: 'City does not have enough in stock' };

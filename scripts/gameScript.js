@@ -32,8 +32,8 @@ $(document).on('cityArrive', function(e, data){
     $('.aircraft_marker[id="'+data.aircraft_id+'"]').fadeOut(1000);
 });
 
-$(document).on('cityLeave', function(e, data){
-    $('.aircraft_marker[id="'+data.aircraft_id+'"]').fadeIn(1000);
+$(document).on('cityLeave', function(e, aircraft_id){
+    $('.aircraft_marker[id="'+aircraft_id+'"]').fadeIn(1000);
 });
 
 

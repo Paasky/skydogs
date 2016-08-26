@@ -296,39 +296,6 @@ function updateAircraftIcons(){
 }
 
 
-function drawCityScreen(e, data){
-    if(data.aircraft_id != game_data.player_settings.id) return;
-    var city = game_data.CITIES.get(data.city_id);
-    var country = city.getCountry();
-
-    $('#cityScreen-country').css('backgroundColor', country.color1).css('color', country.color2);
-    $('#cityScreen-country-flag').prop('src', getFlagUrl(country.flag_file));
-    $('#cityScreen-country-name').text(country.name);
-    $('#cityScreen-name').text(city.name);
-    $('#cityScreen-popNumber').text(city.population.city);
-    $('#cityScreen').fadeIn();
-
-    var content = $('#cityScreen-content');
-}
-$(document).on('cityArrive', drawCityScreen);
-
-$('#cityScreen-sellAllBtn').click(function(){
-    var a = game_data.AIRCRAFTS.get(game_data.player_settings.id);
-    if(!a.cargoHold.ids.length) alert(JSON.stringify({success: false, message: 'Cargo Hold is empty'}));
-    a.cargoHold.forEach(function(co){
-        alert(JSON.stringify(userSellCommodity(co.id, co.amount).message));
-    });
-});
-$('#cityScreen-refuelBtn').click(function(){
-    alert(JSON.stringify(userRefuel().message));
-});
-
-$('#cityScreen-leaveBtn').click(function(){
-    $('#cityScreen').fadeOut();
-    $(document).trigger('cityLeave', game_data.PLAYERS.get(game_data.player_settings.id).getAircraft().id);
-});
-
-
 function onScreenUpdate(){
     $(document).trigger('screenUpdate');
     tick(game_data.AIRCRAFTS, game_data.player_settings.tick_length);

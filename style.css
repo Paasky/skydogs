@@ -18,6 +18,10 @@ table.tablesorter thead tr:nth-child(2) .headerSortUp {
 table.tablesorter thead tr:nth-child(2) .headerSortDown {
 	background-image: url(lib/desc.gif);
 }
+    td[action] {
+        text-decoration: underline;
+        cursor: pointer;
+    }
 
 /* classes */
 .full-size {
@@ -26,6 +30,12 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
 }
 .borderRight {
     border-right: 1px #333 solid;
+}
+.center_xy {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translateY(-50%) translateX(-50%);
 }
 
 /* attrs */
@@ -125,6 +135,62 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
 
 
 
+/* window */
+.window {
+    background: #fff;
+    border: 3px #333 solid;
+    border-radius: 6px;
+    font-size: 2em;
+    max-width: 90%;
+    z-index: 110;
+}
+.window.active {
+    z-index: 115;
+}
+    .windowHeader {
+        border-bottom: 1px #333 solid;
+        background: rgba(0,0,0,0.5);
+        padding-left: 0.5em;
+        color: #fff;
+        position: relative;
+        padding-right: 1.5em;
+    }
+    .warn .windowHeader {
+        background: rgba(255,0,0,0.75);
+    }
+        .windowClose {
+            display: inline-block;
+            float: right;
+            width: 1.2em;
+            line-height: 1em;
+            text-align: center;
+            background: red;
+            height: 100%;
+            border-left: 1px#333 solid;
+            cursor: pointer;
+            position: absolute;
+            right: 0;
+            top: 0;
+        }
+    .windowContent, .windowFooter {
+        padding: 0.25em 0.5em;
+    }
+    .windowButton {
+        display: inline-block;
+        padding: 0.1em 0.5em;
+        border: 2px #333 solid;
+        margin: 0 0.25em;
+        cursor: pointer;
+    }
+    .windowButton:first-child {
+        margin-left: 0;
+    }
+    .windowButton:last-child {
+        margin-right: 0;
+    }
+
+
+
 /* city screen */
 
 #cityScreen {
@@ -139,12 +205,8 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
     max-width: 1000px;
     background: #e3dfcf;
     max-height: 98vh;
-    top: 50%;
-    left: 50%;
-    transform: translateY(-50%) translateX(-50%);
     border: 10px #333 solid;
     border-radius: 20px;
-    position: absolute;
     box-shadow: 0px 0px 10px 0px #ddd;
 }
     #cityScreenLeft {

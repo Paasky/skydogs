@@ -1,3 +1,83 @@
+function WindowFactory(){
+    
+    this.create = function(data, returnString){
+        // data: {header: '', content: '' footer: '', type: '', id:''}
+        if(!data) return {success: false, message: 'Window(): data is required'};
+        if(!data.content) return {success: false, message: 'Window(): content is required'};
+        if(!data.type && !data.header) return {success: false, message: 'Window(): header is required if type is not set'};
+        
+        var types = {
+            info: {
+                header: 'Information',
+                footer: '<span class="windowButton" action="close">OK</span>'
+            },
+            confirm: {
+                header: 'Confirm',
+                footer: '<span class="windowButton" action="confirm">Yes</span><span class="windowButton" action="cancel">No</span>'
+            },
+            warn: {
+                header: 'Warning!',
+                footer: '<span class="windowButton" action="confirm">Continue</span><span class="windowButton" action="cancel">Cancel</span>'
+            }
+        };
+        if(data.type && !types[data.type]) return {success: false, message: 'Window(): '+data.type+' not found in types'};
+        if( (data.type == 'confirm' || data.type == 'confirm' ) &&
+            (!data.callback || typeof(data.callback) != 'function') ){
+            return {success: false, message: 'Window(): confirm window requires a callback function'};
+        }
+        
+        var windowType = types[data.type];
+        
+        // window div
+        var html = '<div class="window center_xy';
+        if(data.type) html+= ' '+data.type;
+        html+='"';
+        if(data.id) html+=' id="'+data.id+'"';
+        html+='>';
+        
+        // header
+        html+='<div class="windowHeader">';
+        if(data.header){
+            html+=data.header;
+        } else {
+            html+=windowType.header;
+        }
+        if(data.type != 'confirm' && data.type != 'warn'){
+            html+='<span class="windowClose" action="close">x</span>';
+        }
+        html+='</div>';
+        
+        // content
+        html+='<div class="windowContent">';
+        html+=data.content;
+        html+='</div>';
+        
+        // footer
+        if(data.footer || windowType){
+            html+='<div class="windowFooter">';
+            if(data.footer){
+                html+=data.footer;
+            } else {
+                html+=windowType.footer;
+            }
+            html+='</div>';
+        }
+        
+        // close window div
+        html+='</div>';
+        
+        if(returnString) return html;
+        
+        var newWindow = $(html);
+        
+        newWindow.find('[action="close"]').click(function(){newWindow.remove()});
+        newWindow.find('[action="confirm"]').click(function(){newWindow.remove();data.callback(true);});
+        newWindow.find('[action="cancel"]').click(function(){newWindow.remove();data.callback(false);});
+        
+        $('#app-container').append(newWindow);
+    }
+}
+
 // city
 function drawCityScreen(e, data){
     if(data.aircraft_id != game_data.player_settings.id) return;
@@ -35,16 +115,16 @@ function drawCityScreenMarket(){
         table += '<tr>';
         
             table += '<td class="borderRight">'+co.name+'</td>';
-            table += '<td>'+getMoney(city.getCommodityBuyPrice(co).message, true)+'</td>';
+            table += '<td action="sell" co_id="'+co.id+'">'+getMoney(city.getCommodityBuyPrice(co).message, true)+'</td>';
         if(city.market.get(co.id).amount != 0){
-            table += '<td>'+getMoney(city.getCommoditySalePrice(co).message, true)+'</td>';
+            table += '<td action="buy" co_id="'+co.id+'">'+getMoney(city.getCommoditySalePrice(co).message, true)+'</td>';
         } else {
             table += '<td></td>';
         }
             table += '<td class="borderRight">'+city.market.get(co.id).amount+'</td>';
         if(aircraft.getCargo(co).success){
-            table += '<td>'+getMoney(aircraft.getCargo(co).message.valuePerItem, true)+'</td>';
-            table += '<td>'+aircraft.getCargo(co).message.amount+'</td>';
+            table += '<td action="sell" co_id="'+co.id+'">'+getMoney(aircraft.getCargo(co).message.valuePerItem, true)+'</td>';
+            table += '<td action="sell" co_id="'+co.id+'">'+aircraft.getCargo(co).message.amount+'</td>';
         } else {
             table += '<td></td>';
             table += '<td>0</td>';

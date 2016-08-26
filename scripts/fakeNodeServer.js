@@ -136,7 +136,7 @@ var server = {
                 // if the player is active, do stuff
                 } else {
                     var amount = 250;
-                    var bestProfit = {profit: 0, id:0};
+                    var bestProfit = {profit: 0, id:0, profitPerKm: 0};
 
                     // find cities that are in range
                     CITIES.forEach(function(checkCity){
@@ -162,13 +162,12 @@ var server = {
                             var profit = sales - cost;
                             if(profit < 0) return;
 
-                            // costs & actual profit
-                            var flightCosts = getCostPerKm(a) * range.dist.km;
-                            var routeProfit = profit - flightCosts;
+                            // profitPerKm
+                            var profitPerKm = profit / range.dist.km;
 
                             // is it better than what we have?
-                            if(bestProfit.profit < routeProfit){
-                                bestProfit.profit = routeProfit;
+                            if(bestProfit.profitPerKm < profitPerKm){
+                                bestProfit.profit = profit;
                                 bestProfit.id = checkCity.id;
                                 bestProfit.co = co;
                             }
@@ -476,10 +475,10 @@ function buyCommodity(aircraft, commodity, amount){
 
     return {success: true, message: { price: sum }};
 }
-function userSellCommodity(commodity_id, amount){
+function userBuyCommodity(commodity_id, amount){
     var commodity = COMMODITIES.get(commodity_id);
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
-    return sellCommodity(aircraft, commodity, amount);
+    return buyCommodity(aircraft, commodity, amount);
 }
 
 function sellCommodity(aircraft, commodity, amount){
@@ -493,7 +492,7 @@ function sellCommodity(aircraft, commodity, amount){
     var player = aircraft.getPlayer();
 
     // get the price & can we sell this much?
-    var priceStatus = city.getCommodityBuyPrice(commodity);
+    var priceStatus = city.getCommodityBuyPrice(commodity, amount);
     if(!priceStatus.success) return priceStatus;
 
     // get the origValue if it's there
@@ -530,9 +529,11 @@ function sellCommodity(aircraft, commodity, amount){
 
     return {success: true, message: message };
 }
-function userSellCommodity(commodity, amount){
+function userSellCommodity(commodity_id, amount){
+    var commodity = COMMODITIES.get(commodity_id);
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
-    return sellCommodity(aircraft, commodity, amount);
+    var aircraft_commodity = aircraft.getCargo(commodity, amount).message;
+    return sellCommodity(aircraft, aircraft_commodity, amount);
 }
 
 function refuel(aircraft, amount){
@@ -542,8 +543,8 @@ function refuel(aircraft, amount){
     var player = aircraft.getPlayer();
 
     if(! amount || amount==-1) amount = aircraft.fuel.max - aircraft.fuel.amount;
-
-    var priceReply = city.getCommoditySalePrice(COMMODITIES.get(18)); // 18 = fuel
+    if(amount===0) return {success: false, message: 'Aircraft is full of fuel'};
+    var priceReply = city.getCommoditySalePrice(COMMODITIES.get(18), amount); // 18 = fuel
     if(!priceReply.success) return priceReply;
     var sum = getMoney(priceReply.message * amount);
     if(player.money < sum ) return {success: false, message: 'Not enough money'};

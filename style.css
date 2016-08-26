@@ -6,6 +6,14 @@ body {
     height: 100%;
     width: 100%;
 }
+[disabled] {
+    color: #999 !important;
+    background-color: rgba(28,28,28,0.1) !important;
+    border-color: #999 !important;
+    cursor: not-allowed !important;
+}
+
+
 #app-container {
     position: absolute;
 }
@@ -138,6 +146,7 @@ body {
             border-top-right-radius: 10px;
             border-left: 0;
             cursor: pointer;
+            transition: all 0.5s
         }
         .cityScreen-btn:hover {
             background: rgba(255,255,255,0.3)

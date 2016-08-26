@@ -312,8 +312,9 @@ function drawCityScreen(e, data){
 }
 $(document).on('cityArrive', drawCityScreen);
 
-$('#cityScreen-buyAllBtn').click(function(){
+$('#cityScreen-sellAllBtn').click(function(){
     var a = game_data.AIRCRAFTS.get(game_data.player_settings.id);
+    if(!a.cargoHold.ids.length) alert(JSON.stringify({success: false, message: 'Cargo Hold is empty'}));
     a.cargoHold.forEach(function(co){
         alert(JSON.stringify(userSellCommodity(co.id, co.amount).message));
     });

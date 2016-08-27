@@ -221,14 +221,6 @@ function updateRangeCircle(){
                 )
            }
         };
-        return {
-            'type': 'Feature',
-            'properties': {},
-            'geometry': {
-                'type': 'LineString',
-                'coordinates': []
-            }
-        };
     }
     
     // create the rangeCircle

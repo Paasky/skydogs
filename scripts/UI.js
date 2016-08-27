@@ -27,13 +27,21 @@ function WindowFactory(){
         }
         
         var windowType = types[data.type];
+        var createNewWindow = true;
+
+        // if we don't return a string & window is in DOM, don't create a new one
+        if(!returnString && $('#'+data.id).length != 0) createNewWindow = false;
+
         
         // window div
-        var html = '<div class="window center_xy';
-        if(data.type) html+= ' '+data.type;
-        html+='"';
-        if(data.id) html+=' id="'+data.id+'"';
-        html+='>';
+        var html = '';
+        if(createNewWindow){
+            html+= '<div class="window center-xy';
+            if(data.type) html+= ' '+data.type;
+            html+='"';
+            if(data.id) html+=' id="'+data.id+'"';
+            html+='>';
+        }
         
         // header
         html+='<div class="windowHeader">';
@@ -42,13 +50,11 @@ function WindowFactory(){
         } else {
             html+=windowType.header;
         }
-        if(data.type != 'confirm' && data.type != 'warn'){
-            html+='<span class="windowClose" action="close">x</span>';
-        }
+        html+='<span class="windowClose" action="cancel">x</span>';
         html+='</div>';
         
         // content
-        html+='<div class="windowContent">';
+        html+='<div class="windowContent scrollable">';
         html+=data.content;
         html+='</div>';
         
@@ -64,17 +70,25 @@ function WindowFactory(){
         }
         
         // close window div
-        html+='</div>';
+        if(createNewWindow){
+            html+='</div>';
+            if(returnString) return html;
+
+            var newWindow = $(html);
+        } else {
+            var newWindow = $('#'+data.id).html(html);
+        }
         
-        if(returnString) return html;
+        newWindow.find('[action="confirm"]').click(function(){
+            newWindow.remove();
+            if(data.callback) data.callback(true);
+        });
+        newWindow.find('[action="cancel"], [action="close"]').click(function(){
+            newWindow.remove();
+            if(data.callback) data.callback(false);
+        });
         
-        var newWindow = $(html);
-        
-        newWindow.find('[action="close"]').click(function(){newWindow.remove()});
-        newWindow.find('[action="confirm"]').click(function(){newWindow.remove();data.callback(true);});
-        newWindow.find('[action="cancel"]').click(function(){newWindow.remove();data.callback(false);});
-        
-        $('#app-container').append(newWindow);
+        if(createNewWindow) $('#app-container').append(newWindow);
     }
 }
 
@@ -90,8 +104,6 @@ function drawCityScreen(e, data){
     $('#cityScreen-name').text(city.name);
     $('#cityScreen-popNumber').text(city.population.city);
     $('#cityScreen').attr('city_id',data.city_id).fadeIn();
-
-    var content = $('#cityScreen-content');
 }
 $(document).on('cityArrive', drawCityScreen);
 

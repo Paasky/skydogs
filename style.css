@@ -31,11 +31,14 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
 .borderRight {
     border-right: 1px #333 solid;
 }
-.center_xy {
+.center-xy {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translateY(-50%) translateX(-50%);
+}
+.scrollable {
+    overflow-y: scroll;
 }
 
 /* attrs */
@@ -143,6 +146,8 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
     font-size: 2em;
     max-width: 90%;
     z-index: 110;
+    max-height: 90%;
+    overflow: hidden;
 }
 .window.active {
     z-index: 115;
@@ -172,7 +177,12 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
             right: 0;
             top: 0;
         }
-    .windowContent, .windowFooter {
+    .windowContent {
+        max-height: 66vh;
+        width: 96%;
+        padding: 0.25em 0.5em;
+    }
+    .windowFooter {
         padding: 0.25em 0.5em;
     }
     .windowButton {
@@ -268,6 +278,7 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
     #cityScreenRight {
         width: 70%;
         float: right;
+        overflow: hidden;
     }
         #cityScreen-name {
             text-align: center;
@@ -285,6 +296,10 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
         #cityScreen h1 {
             margin: 0.5em 0;
             text-align: center;
+        }
+        #cityScreen-content {
+            width: 102.5%;
+            max-height: 80vh;
         }
         
         /* market */

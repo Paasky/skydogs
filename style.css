@@ -5,23 +5,35 @@ body {
     margin: 0;
     min-height: 100vh;
 }
+
 table{ border-spacing: 0; }
-table.tablesorter thead tr:nth-child(2) .header {
-	background-image: url(lib/bg.gif);
-	background-repeat: no-repeat;
-	background-position: center right;
-	cursor: pointer;
-}
-table.tablesorter thead tr:nth-child(2) .headerSortUp {
-	background-image: url(lib/asc.gif);
-}
-table.tablesorter thead tr:nth-child(2) .headerSortDown {
-	background-image: url(lib/desc.gif);
-}
-    td[action] {
-        text-decoration: underline;
+    table.tablesorter thead tr:nth-child(2) .header {
+        background-image: url(lib/bg.gif);
+        background-repeat: no-repeat;
+        background-position: center right;
         cursor: pointer;
     }
+    table.tablesorter thead tr:nth-child(2) .headerSortUp {
+        background-image: url(lib/asc.gif);
+    }
+    table.tablesorter thead tr:nth-child(2) .headerSortDown {
+        background-image: url(lib/desc.gif);
+    }
+        td[action] {
+            text-decoration: underline;
+            cursor: pointer;
+        }
+        td[disabled] {
+            background-color: rgba(0,0,0,0) !important;
+        }
+        .sum-row > td {
+            border-top: 2px #333 solid;
+        }
+
+select, input, textarea {
+    font-size: inherit;
+    border: 2px #333 solid;
+}
 
 /* classes */
 .full-size {
@@ -40,6 +52,10 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
 .scrollable {
     overflow-y: scroll;
 }
+.gray {
+    color: #aaa;
+    font-size: 0.75em;
+}
 
 /* attrs */
 [disabled] {
@@ -54,6 +70,7 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
 /* APP */
 #app-container {
     position: absolute;
+    overflow: hidden;
 }
     #app-container #loading-message {
         position: absolute;
@@ -143,26 +160,38 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
     background: #fff;
     border: 3px #333 solid;
     border-radius: 6px;
-    font-size: 2em;
+    font-size: 1.5em;
     max-width: 90%;
     z-index: 110;
     max-height: 90%;
     overflow: hidden;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 }
 .window.active {
     z-index: 115;
+    box-shadow: 0px 0px 5px 0px rgba(0,0,0,1);
 }
     .windowHeader {
         border-bottom: 1px #333 solid;
-        background: rgba(0,0,0,0.5);
+        background: #444;
         padding-left: 0.5em;
         color: #fff;
         position: relative;
         padding-right: 1.5em;
+        opacity: 0.8
+    }
+    .active .windowHeader {
+        opacity: 1;
     }
     .warn .windowHeader {
-        background: rgba(255,0,0,0.75);
+        background: #d00;
     }
+        .windowHeader select {
+          background: transparent;
+          color: #fff;
+          padding: 0 0.5em;
+          margin: 0.25em;
+        }
         .windowClose {
             display: inline-block;
             float: right;
@@ -306,4 +335,7 @@ table.tablesorter thead tr:nth-child(2) .headerSortDown {
         #cityScreenMarket {
             width: 100%;
             text-align: center;
+        }
+        #shopContent {
+            width: 100%;
         }

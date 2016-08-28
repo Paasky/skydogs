@@ -63,7 +63,7 @@ function createMap(){
 
 // update the city icon size for different zoom levels
 function updateCityIcons(){
-    var radius = Math.round(map.getZoom()/2*10);
+    var radius = Math.round(map.getZoom()/2*12);
     $('.city_marker').css({
         'width': radius + 'px',
         'height': radius + 'px',

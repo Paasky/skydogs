@@ -289,8 +289,11 @@ function updateAircraftIcons(){
 
 
 function onScreenUpdate(){
-    $(document).trigger('screenUpdate');
     tick(game_data.AIRCRAFTS, game_data.player_settings.tick_length);
     drawAircrafts();
+    $(document).trigger('screenUpdate');
+    if(screenTickCounter%10 == 0) $(document).trigger('longScreenUpdate');
+    screenTickCounter++;
 }
 var screenUpdate = setInterval(onScreenUpdate, game_data.player_settings.tick_length);
+var screenTickCounter = 0;

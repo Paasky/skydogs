@@ -26,7 +26,7 @@ function flyToCityId(){
 }
 
 $(document).on('cityClick', function(e, city){
-    flyToCityId(city.id);
+    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', city.id)));
 });
 
 

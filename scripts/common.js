@@ -261,8 +261,8 @@ function getCostPerKm(aircraft){
 function getMoney(amount, asString){
     var roundedAmount = Math.round(amount*100)/100;
     if(asString){
-        if(roundedAmount < 0) return '- $'+(roundedAmount*-1);
-        return '$'+roundedAmount;
+        if(roundedAmount < 0) return '- $'+(roundedAmount*-1).toFixed(2);
+        return '$'+roundedAmount.toFixed(2);
     }
     return roundedAmount;
 }

@@ -497,7 +497,8 @@ function sellCommodity(aircraft, commodity, amount){
 
     // get the origValue if it's there
     var origValue = false;
-    if(commodity.valuePerItem) origValue = getMoney(amount * commodity.valuePerItem);
+    var aircraftCommodityReply = aircraft.getCargo(commodity);
+    if(aircraftCommodityReply.success && aircraftCommodityReply.message.valuePerItem) origValue = getMoney(amount * aircraftCommodityReply.message.valuePerItem);
 
     // try to take it from the aircraft
     var cargoStatus = aircraft.takeCargo(commodity, amount);
@@ -532,8 +533,7 @@ function sellCommodity(aircraft, commodity, amount){
 function userSellCommodity(commodity_id, amount){
     var commodity = COMMODITIES.get(commodity_id);
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
-    var aircraft_commodity = aircraft.getCargo(commodity, amount).message;
-    return sellCommodity(aircraft, aircraft_commodity, amount);
+    return sellCommodity(aircraft, commodity, amount);
 }
 
 function refuel(aircraft, amount){

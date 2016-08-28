@@ -148,6 +148,7 @@ function drawCityScreen(e, data){
     $('#cityScreen-country-name').text(country.name);
     $('#cityScreen-name').text(city.name);
     $('#cityScreen-popNumber').text(city.population.city);
+    $('#cityScreen-content').html('');
     $('#cityScreen').attr('city_id',data.city_id).fadeIn();
 }
 $(document).on('cityArrive', drawCityScreen);
@@ -163,28 +164,43 @@ function drawCityScreenMarket(){
     var table = '<table id="cityScreenMarket" class="tablesorter">';
     
     table += '<thead>';
-        table += '<tr><td class="borderRight" /><td class="borderRight" colspan="3">City</td><td colspan="2">You</td></tr>';
-        table += '<tr><th class="borderRight">Commodity</th><th>Buys for</th><th>Sells for</th><th class="borderRight">Stock</th><th>Value</th><th>Amount</th></tr>';
+        table += '<tr><td class="borderRight" colspan="2">Commodity</td><td class="borderRight" colspan="3">City</td><td colspan="2">You</td></tr>';
+        table += '<tr><th>Name</th><th class="borderRight">Avg.</th><th>Buys for</th><th>Sells for</th><th class="borderRight">Stock</th><th>Value</th><th>Amount</th></tr>';
     table += '</thead>';
     
     table += '<tbody>';
     game_data.COMMODITIES.forEach(function(co){
 
-        if(city.market.get(co.id).amount != 0){
+        var dataCityAmount = city.market.get(co.id).amount;
+        var dataCityModifier = city.market.get(co.id).modifier
+        if(dataCityAmount != 0){
             var buyAction = ' action="buy" co_id="'+co.id+'"';
+
+            if(dataCityModifier > 1){
+                buyAction += ' style="color: rgb('+Math.round((dataCityModifier-1)*128)+',0,0);"';
+            } else {
+                buyAction += ' style="color: rgb(0,'+Math.round((dataCityModifier-1)*-256)+',0);"';
+            }
         } else {
             var buyAction = ' disabled';
         }
 
         if(aircraft.getCargo(co).success){
             var sellAction = ' action="sell" co_id="'+co.id+'"';
+
+            if(dataCityModifier > 1){
+                sellAction += ' style="color: rgb(0,'+Math.round((dataCityModifier-1)*128)+',0);"';
+            } else {
+                sellAction += ' style="color: rgb('+Math.round((dataCityModifier-1)*-256)+',0,0);"';
+            }
         } else {
             var sellAction = ' disabled';
         }
         
         table += '<tr>';
 
-            table += '<td class="borderRight">'+co.name+'</td>';
+            table += '<td>'+co.name+'</td>';
+            table += '<td class="borderRight">'+getMoney(co.base_price, true)+'</td>';
             table += '<td'+sellAction+'>'+getMoney(city.getCommodityBuyPrice(co).message, true)+'</td>';
             table += '<td'+buyAction+'>'+getMoney(city.getCommoditySalePrice(co).message, true)+'</td>';
             table += '<td'+buyAction+' class="borderRight">'+city.market.get(co.id).amount+'</td>';

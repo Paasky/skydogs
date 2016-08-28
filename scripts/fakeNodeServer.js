@@ -434,7 +434,9 @@ function setDestination(aircraft, type, city_id){
 }
 function userSetDestination(type, id){
     var aircraft = PLAYERS.get(server_data.player_settings.id).getAircraft();
-    return setDestination(aircraft, type, parseInt(id))
+    var destReply = setDestination(aircraft, type, parseInt(id));
+    if(destReply.success) $(document).trigger('cityLeave', aircraft.id);
+    return destReply;
 }
 
 function buyCommodity(aircraft, commodity, amount){

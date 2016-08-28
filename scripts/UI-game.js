@@ -15,7 +15,7 @@ function drawWorldMarketWindow(){
     content += '</table>';
 
     WindowFactory.create({header: header, content: content, id: 'worldMarketWindow'});
-    setWorldMarketWindowData();
+    setWorldMarketData();
     $('#worldMarket').tablesorter();
     $('#worldMarket [flyToCityId]').click(flyToCityId);
 }

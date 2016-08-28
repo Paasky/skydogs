@@ -1,6 +1,6 @@
 // create the world market window
 function drawWorldMarketWindow(){
-    var header = 'World Markets';
+    var header = 'World Market';
     header += '<span id="worldMarketFilterBtn" class="windowButton">Filter</span>';
 
     var content = '<table id="worldMarket" class="tablesorter">';
@@ -19,6 +19,7 @@ function drawWorldMarketWindow(){
     $('#worldMarket').tablesorter();
     $('#worldMarket [flyToCityId]').click(flyToCityId);
 }
+$('#worldMarketBtn').click(drawWorldMarketWindow);
 
 // set the world market window data, every 1000ms
 function setWorldMarketData(){

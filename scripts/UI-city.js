@@ -13,6 +13,8 @@ function drawCityScreen(e, data){
     $('#cityScreen').attr('city_id',data.city_id).fadeIn();
 }
 $(document).on('cityArrive', drawCityScreen);
+$(document).on('cityLeave', leaveCity);
+
 
 // draws the market table on cityScreen marketBtn click
 function drawCityScreenMarket(){
@@ -265,7 +267,8 @@ $('#cityScreen-refuelBtn').click(function(e){
 });
 
 // Leaves the city
-$('#cityScreen-leaveBtn').click(function(){
+function leaveCity(){
     $('#cityScreen').fadeOut();
     $(document).trigger('cityLeave', game_data.PLAYERS.get(game_data.player_settings.id).getAircraft().id);
-});
+}
+$('#cityScreen-leaveBtn').click(leaveCity);

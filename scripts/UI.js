@@ -137,3 +137,7 @@ var WindowFactory = {
     }
 }
 
+$(document).keypress(function(e){
+  if (e.keyCode === 13) $('.window.active [action="confirm"]').last().click();     // enter
+  if (e.keyCode === 27) $('.window.active [action="close"]').last().click();   // esc
+});

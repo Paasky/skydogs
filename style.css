@@ -339,3 +339,17 @@ select, input, textarea {
         #shopContent {
             width: 100%;
         }
+
+/* world market window */
+#worldMarketWindow {
+    width: 35em;
+    font-size: 1em;
+    text-align: center;
+}
+    #worldMarketWindow .windowHeader {
+        font-size: 1.5em;
+        padding: 0.1em 0;
+    }
+    #worldMarket {
+        width: 100%;
+    }

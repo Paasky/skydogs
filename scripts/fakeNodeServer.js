@@ -317,7 +317,8 @@ var server = {
 
         // create new AI's
         } else {
-            while(PLAYERS.ids.length < AIlimit){
+            var createdAIs = 0;
+            while(PLAYERS.ids.length < AIlimit && createdAIs < 25){
                 var city = CITIES.get(CITIES.ids[ Math.floor(Math.random()*CITIES.ids.length) ]);
 
                 var destination = { id:0, lat:0, lng:0, type:'none' };
@@ -347,6 +348,7 @@ var server = {
                 AIRCRAFTS.set( new Aircraft(aircraftId, a_name, fuel, 360, position, destination, playerId) );
 
                 console.log('Added new AI ('+playerId+') with aircraft #'+aircraftId);
+                createdAIs++;
             }
         }
         $(document).trigger('supertickDone');

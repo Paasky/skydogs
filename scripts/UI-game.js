@@ -64,10 +64,3 @@ function setWorldMarketDataRow(aircraft, city, co, inRangeOnly){
     }
 
 }
-
-// fly to the city
-function flyToCityId(){
-
-    var cityId = $(this).attr('flyToCityId');
-    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', cityId)));
-}

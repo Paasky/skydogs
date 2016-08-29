@@ -157,21 +157,33 @@ function createShopWindow(){
     content += '<table id="shopContent">';
     content += '<tr>';
         content += '<td>Amount:</td>';
-        content += '<td><input type=number id="shopAmount" value="1"></td>';
+        content += '<td><input type=number id="shopAmount" value="1" min="1"></td>';
         content += '<td class="gray">(<span id="shopAmountAvailable"></span> available)</td>';
     content += '</tr>';
     content += '<tr>';
-        content += '<td>Price:</td>';
+        content += '<td>Unit Price:</td>';
         content += '<td><span id="shopCommodityPrice"></span></td>';
     content += '</tr>';
+    content += '<tr>';
+        content += '<td>Unit Weight:</td>';
+        content += '<td><span id="shopCommodityWeight"></span> kg</td>';
+    content += '</tr>';
     content += '<tr class="sum-row">';
-        content += '<td>Total:</td>';
-        content += '<td><span id="shopSum"></span></td>';
-        content += '<td rowspan="2"><span id="shopConfirm" class="windowButton" action="confirm"></span></td>';
+        content += '<td>Total Sum:</td>';
+        content += '<td><span id="shopPriceSum"></span></td>';
+        content += '<td rowspan="4"><span id="shopConfirm" class="windowButton" action="confirm"></span></td>';
     content += '</tr>';
     content += '<tr class="gray">';
         content += '<td>Your money:</td>';
         content += '<td><span id="shopPlayerMoneyAvailable"></span></td>';
+    content += '</tr>';
+    content += '<tr>';
+        content += '<td>Total Weight:</td>';
+        content += '<td><span id="shopWeightSum"></span> kg</td>';
+    content += '</tr>';
+    content += '<tr class="gray">';
+        content += '<td>Free space:</td>';
+        content += '<td><span id="shopPlayerWeightAvailable"></span> kg</td>';
     content += '</tr>';
     content += '</table>';
 
@@ -193,6 +205,7 @@ function setShopWindowData(){
     var aircraft = player.getAircraft();
     var shop = $('#shopWindow');
     var commodity = game_data.COMMODITIES.get($('#shopCommoditySelector').val());
+    var commodityWeight = commodity.weight;
 
     // buying or selling
     var shopType = $('#shopTypeSelector').val();
@@ -201,6 +214,7 @@ function setShopWindowData(){
 
     // amounts
     var shopAmount = $('#shopAmount').val();
+    if(shopAmount < 1) shopAmount = 1;
     if(shopType=='buy'){
         var amountAvailable = city.market.get(commodity.id).amount;
     } else {
@@ -208,6 +222,7 @@ function setShopWindowData(){
     }
     $('#shopAmountAvailable').text(amountAvailable);
     $('#shopPlayerMoneyAvailable').text(getMoney(player.money, true));
+    $('#shopPlayerWeightAvailable').text(aircraft.getFreeCargoSpace());
 
     // price
     if(shopType=='buy'){
@@ -216,7 +231,17 @@ function setShopWindowData(){
         var cityPrice = city.getCommodityBuyPrice(commodity).message;
     }
     $('#shopCommodityPrice').text(getMoney(cityPrice, true));
-    $('#shopSum').text(getMoney(cityPrice * shopAmount, true));
+    $('#shopCommodityWeight').text(commodityWeight);
+    $('#shopPriceSum').text(getMoney(cityPrice * shopAmount, true));
+    $('#shopWeightSum').text(commodityWeight * shopAmount);
+
+    var enoughMoney = player.money >= cityPrice * shopAmount;
+    var enoughSpace = aircraft.getFreeCargoSpace() >= commodityWeight * shopAmount;
+    if(!enoughMoney || !enoughSpace){
+        $('#shopConfirm').attr('disabled','').removeAttr('action');
+    } else {
+        $('#shopConfirm').attr('action','confirm').removeAttr('disabled');
+    }
 }
 
 // callback function for shopWindow action

@@ -171,6 +171,7 @@ var server = {
                                 bestProfit.profit = profit;
                                 bestProfit.id = checkCity.id;
                                 bestProfit.co = co;
+                                bestProfit.amount = amount;
                             }
                         });
                     });
@@ -183,7 +184,7 @@ var server = {
                     }
 
                     // buy the stuff
-                    var purchaseStatus = buyCommodity(a, bestProfit.co, amount);
+                    var purchaseStatus = buyCommodity(a, bestProfit.co, bestProfit.amount);
                     if(!purchaseStatus.success) return purchaseStatus;
 
                     console.log('merchantAI ('+p.id+'): heads for '+city.name+' for $'+Math.round(bestProfit.profit)+' profit!');

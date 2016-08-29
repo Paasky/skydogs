@@ -1,3 +1,46 @@
+
+
+app.controller('CityUIController', function UIController($scope) {
+    var scopeSources = [
+        'COUNTRIES', 'CITIES', 'COMMODITIES', 'PLAYERS', 'AIRCRAFTS',
+        'AIRCRAFTTYPES', 'game_settings', 'player_settings',
+    ];
+    scopeSources.forEach(function(source){
+        $scope[source] = game_data[source];
+    });
+
+    $scope.cityScreen = {
+        country: {
+            name: '',
+            flagUrl: '',
+            css: '',
+        },
+        city: {
+            name: '',
+            pop: 0,
+        },
+    };
+    $(document).on('cityArrive', function(e, data){
+        if(data.player_id != $scope.player_settings.id) return;
+        var city = $scope.CITIES.get(data.city_id);
+        var country = city.getCountry();
+
+        $scope.cityScreen.country.name = country.name;
+        $scope.cityScreen.country.flagUrl = getFlagUrl(country.flag_file);
+        $scope.cityScreen.country.css = 'color: '+country.color2+'; background: '+country.color1+';';
+        $scope.cityScreen.city.id = city.id;
+        $scope.cityScreen.city.name = city.name;
+        $scope.cityScreen.city.pop = city.population.city;
+
+        $scope.$apply()
+    });
+
+});
+
+
+/////// OLD JQUERY ///////
+
+
 // draws the city screen on cityArrive
 function drawCityScreen(e, data){
     if(data.aircraft_id != game_data.player_settings.id) return;

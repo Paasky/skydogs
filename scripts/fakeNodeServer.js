@@ -135,8 +135,8 @@ var server = {
 
                 // if the player is active, do stuff
                 } else {
-                    var amount = 250;
                     var bestProfit = {profit: 0, id:0, profitPerKm: 0};
+                    var cargoSpace = a.getFreeCargoSpace();
 
                     // find cities that are in range
                     CITIES.forEach(function(checkCity){
@@ -147,6 +147,7 @@ var server = {
 
                         // loop through each commodity
                         COMMODITIES.forEach(function(co){
+                            var amount = Math.round(cargoSpace / co.weight-0.5);
 
                             // check can we buy & sell this
                             var purchaseStatus = currentCity.getCommoditySalePrice(co, amount);

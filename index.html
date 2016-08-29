@@ -5,19 +5,19 @@
         <link rel="stylesheet" href="style.css">
     </head>
     <body>
-        <div id="app-container" class="loading full-size">
+        <div ng-app="skyDogs" id="app-container" class="loading full-size">
             <div id="loading-message" class="full-size"><span>Loading <span id="loading-message-type">Libraries</span></span></div>
-            <div ng-app="skyDogs" ng-controller="Ctrl" class="full-size">
+            <div class="full-size">
                 <div id="map-canvas" class="full-size" />
                 <div id="top-menu">
                     <div id="worldMarketBtn" class="menuBtn">World Market</div>
                 </div>
-                <div id="cityScreen" class="full-size">
+                <div ng-controller="CityUIController" id="cityScreen" class="full-size">
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
                             <div id="cityScreen-country">
-                                <img id="cityScreen-country-flag">
-                                <div id="cityScreen-country-name"></div>
+                                <img id="cityScreen-country-flag" src="{{cityScreen.country.flagUrl}}">
+                                <div id="cityScreen-country-name">{{cityScreen.country.name}}</div>
                             </div>
                             <div id="cityScreen-marketBtn" class="cityScreen-btn">
                                 Market
@@ -32,8 +32,8 @@
                             <div id="cityScreen-leaveBtn" class="cityScreen-btn">Leave city</div>
                         </div>
                         <div id="cityScreenRight">
-                            <div id="cityScreen-name"></div>
-                            <div id="cityScreen-pop">Pop. <span id="cityScreen-popNumber"></span></div>
+                            <div id="cityScreen-name">{{cityScreen.city.name}}</div>
+                            <div id="cityScreen-pop">Pop. {{cityScreen.city.pop}}</div>
                             <div id="cityScreen-content" class="scrollable"></div>
                         </div>
                     </div>
@@ -47,7 +47,7 @@
                 -->
             </div>
         </div>
-<!--        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script> -->
+        <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.22.0/mapbox-gl.js'></script>
         <script src='lib/turf.min.js'></script>

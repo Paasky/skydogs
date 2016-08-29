@@ -5,10 +5,10 @@ function drawCityScreen(e, data){
     var country = city.getCountry();
 
     $('#cityScreen-country').css('backgroundColor', country.color1).css('color', country.color2);
-    $('#cityScreen-country-flag').prop('src', getFlagUrl(country.flag_file));
-    $('#cityScreen-country-name').text(country.name);
-    $('#cityScreen-name').text(city.name);
-    $('#cityScreen-popNumber').text(city.population.city);
+    //$('#cityScreen-country-flag').prop('src', getFlagUrl(country.flag_file));
+    //$('#cityScreen-country-name').text(country.name);
+    //$('#cityScreen-name').text(city.name);
+    //$('#cityScreen-popNumber').text(city.population.city);
     $('#cityScreen-content').html('');
     $('#cityScreen').attr('city_id',data.city_id).fadeIn();
 }

@@ -12,14 +12,29 @@ app.controller('CityUIController', function UIController($scope) {
     
     $scope.cityScreen = {
         country: {
-            name: 'Confederacy',
-            flagUrl: 'file:///F:/Documents/skydogs/angular_app/img/flag/confederacy.png',
+            name: '',
+            flagUrl: '',
+            css: '',
         },
         city: {
-            name: 'Wheeling',
-            pop: 62000,
+            name: '',
+            pop: 0,
         },
     };
+    $(document).on('cityArrive', function(e, data){
+        if(data.player_id != $scope.player_settings.id) return;
+        var city = $scope.CITIES.get(data.city_id);
+        var country = city.getCountry();
+
+        $scope.cityScreen.country.name = country.name;
+        $scope.cityScreen.country.flagUrl = getFlagUrl(country.flag_file);
+        $scope.cityScreen.country.css = 'color: '+country.color2+'; background: '+country.color1+';';
+        $scope.cityScreen.city.id = city.id;
+        $scope.cityScreen.city.name = city.name;
+        $scope.cityScreen.city.pop = city.population.city;
+
+        $scope.$apply()
+    });
     
 });
 

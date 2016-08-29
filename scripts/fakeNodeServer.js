@@ -226,7 +226,7 @@ var server = {
                 }
             }
             if(game_data.AIRCRAFTS.get(a.id)){
-                $(document).trigger('cityArrive', {aircraft_id: a.id, city_id: a.position.id});
+                $(document).trigger('cityArrive', {player_id: p.id, aircraft_id: a.id, city_id: a.position.id});
             }
         });
         if(tickCounter % server_data.game_settings.super_tick_length == 0) server.superTick();

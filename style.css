@@ -335,6 +335,7 @@ select, input, textarea {
             text-align: center;
             font-size: 3em;
             margin-top: 0.3333em;
+            line-height: 1em;
         }
 
         #cityScreen-pop {

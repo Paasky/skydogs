@@ -12,11 +12,11 @@
                 <div id="top-menu">
                     <div id="worldMarketBtn" class="menuBtn">World Market</div>
                 </div>
-                <div ng-controller="CityUIController" id="cityScreen" class="full-size">
+                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{cityScreen.city.id}}">
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
-                            <div id="cityScreen-country">
-                                <img id="cityScreen-country-flag" src="{{cityScreen.country.flagUrl}}">
+                            <div id="cityScreen-country" style="{{cityScreen.country.css}}">
+                                <img id="cityScreen-country-flag" ng-src="{{cityScreen.country.flagUrl}}">
                                 <div id="cityScreen-country-name">{{cityScreen.country.name}}</div>
                             </div>
                             <div id="cityScreen-marketBtn" class="cityScreen-btn">
@@ -39,12 +39,6 @@
                     </div>
                 </div>
                 <div id="logger"></div>
-                <!--
-                First Name: <input type="text" ng-model="firstName"><br>
-                Last Name: <input type="text" ng-model="lastName"><br>
-                <br>
-                Full Name: {{firstName + " " + lastName}}
-                -->
             </div>
         </div>
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>

@@ -76,7 +76,7 @@ var CITYSALEHISTORY = [];
 
 
 var AIRCRAFTS = new ObjectHolder();
-function Aircraft(id, name, fuel, speed, position, destination, player_id, server) {
+function Aircraft(id, name, fuel, speed, position, destination, player_id, server, aircraftTypeId) {
     if(server===undefined) server=true;
     this.id = id;
     this.name = name;
@@ -90,6 +90,7 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
     this.getPlayer = function(){ if(this.server){ return PLAYERS.get(player_id); } else { return game_data.PLAYERS.get(player_id); } };
     this.addCargo = function(commodity, amount, purchasePrice){
         if(!commodity || !amount) return {success: false, message: 'Aircraft.addCargo(): commodity and amount are required'};
+        if(this.getFreeCargoSpace() - commodity.weight * amount < 0) return {success: false, message: 'Cargo hold can\'t fit! Room in hold: '+this.getFreeCargoSpace()+'kg'};
         
         var currentCommodity = this.cargoHold.get(commodity.id);
         if(currentCommodity){
@@ -144,6 +145,29 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
 
         return { success: true, message: cargoHoldCommodity };
     }
+    this.getFreeCargoSpace = function(){
+        var empty = this.cargoHold.size;
+        this.cargoHold.forEach(function(co){
+            empty -= co.weight * co.amount;
+        });
+        return empty;
+    }
+    
+    this.getAircraftType = function(){ if(this.server){ return AIRCRAFTTYPES.get(aircraftTypeId); } else { return game_data.AIRCRAFTTYPES.get(aircraftTypeId); } };
+    
+    this.cargoHold.size = this.getAircraftType().cargoHoldSize;
+}
+
+var AIRCRAFTTYPES = new ObjectHolder();
+function AircraftType(id, name, weight, maxWeight, cargoHoldSize, fuelTankSize, speedMod, price){
+    this.id = id;
+    this.name = name;
+    this.weight = weight;
+    this.maxWeight = maxWeight;
+    this.cargoHoldSize = cargoHoldSize;
+    this.fuelTankSize = fuelTankSize;
+    this.speedMod = speedMod;
+    this.price = price;
 }
 
 var COUNTRIES = new ObjectHolder();

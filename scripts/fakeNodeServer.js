@@ -345,7 +345,7 @@ var server = {
                 var aircraftId = getFirstFreeAircraftId();
 
                 PLAYERS.set( new Player(playerId, p_name, true, Math.round(Math.random()*50)+100, aircraftId) );
-                AIRCRAFTS.set( new Aircraft(aircraftId, a_name, fuel, 360, position, destination, playerId) );
+                AIRCRAFTS.set( new Aircraft(aircraftId, a_name, fuel, 360, position, destination, playerId, true, 1) );
 
                 console.log('Added new AI ('+playerId+') with aircraft #'+aircraftId);
                 createdAIs++;
@@ -370,6 +370,7 @@ var game_data = {
     player_settings: server_data.player_settings,
     COUNTRIES: COUNTRIES,
     CITIES: CITIES,
+    AIRCRAFTTYPES: AIRCRAFTTYPES,
     PLAYERS: new ObjectHolder(),
     AIRCRAFTS: new ObjectHolder(),
     COMMODITIES: COMMODITIES,

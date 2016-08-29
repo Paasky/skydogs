@@ -3272,6 +3272,48 @@ function getDB(){
         {"id":22,"name":"Cigarettes","base_cost":0.60,"weight":0.5,"unit":"carton","units":"cartons","req_per_pop":0.015},
         {"id":23,"name":"Toys","base_cost":1.50,"weight":1.0,"unit":"box","units":"boxes","req_per_pop":0.001},
     ];
+    
+    var aircraft_types_raw = [
+        {id:1,name:'C-W Devastator',weight:350,maxWeight:1750,cargoHoldSize:125,fuelTankSize:70,speedMod:5,price:1000},
+        {id:2,name:'M-S Le Frelon',weight:200,maxWeight:1000,cargoHoldSize:250,fuelTankSize:40,speedMod:5,price:678},
+        {id:3,name:'TNCA Prisa',weight:450,maxWeight:2250,cargoHoldSize:125,fuelTankSize:90,speedMod:2,price:829},
+        {id:4,name:'Vought Buccaneer',weight:350,maxWeight:1750,cargoHoldSize:250,fuelTankSize:70,speedMod:5,price:1191},
+        {id:5,name:'GM D-Bird',weight:450,maxWeight:2250,cargoHoldSize:125,fuelTankSize:90,speedMod:5,price:1405},
+        {id:6,name:'Macchi Saetta',weight:450,maxWeight:2250,cargoHoldSize:250,fuelTankSize:90,speedMod:3,price:829},
+        {id:7,name:'Hughes Bloodhawk',weight:300,maxWeight:1500,cargoHoldSize:250,fuelTankSize:60,speedMod:5,price:1000},
+        {id:8,name:'Polikarpov Gryzun',weight:200,maxWeight:1000,cargoHoldSize:125,fuelTankSize:40,speedMod:5,price:678},
+        {id:9,name:'Mitsubishi Kaito',weight:200,maxWeight:1000,cargoHoldSize:125,fuelTankSize:40,speedMod:3,price:546},
+
+        {id:10,name:'C-W Mule',weight:550,maxWeight:2750,cargoHoldSize:500,fuelTankSize:110,speedMod:2,price:2383},
+        {id:11,name:'Hawker Twister',weight:450,maxWeight:2250,cargoHoldSize:375,fuelTankSize:90,speedMod:3,price:2000},
+        {id:12,name:'TNCA Xolotl',weight:500,maxWeight:2500,cargoHoldSize:375,fuelTankSize:100,speedMod:1,price:1356},
+        {id:13,name:'Grumman Puma',weight:650,maxWeight:3250,cargoHoldSize:375,fuelTankSize:130,speedMod:3,price:2809},
+        {id:14,name:'Ford Raven',weight:500,maxWeight:2500,cargoHoldSize:500,fuelTankSize:100,speedMod:4,price:3280},
+        {id:15,name:'Focke-Wulf Schrei',weight:350,maxWeight:1750,cargoHoldSize:500,fuelTankSize:70,speedMod:4,price:2809},
+        {id:16,name:'Fairchild Altamira',weight:450,maxWeight:2250,cargoHoldSize:375,fuelTankSize:90,speedMod:4,price:2383},
+        {id:17,name:'Stearman Barnstormer',weight:400,maxWeight:2000,cargoHoldSize:250,fuelTankSize:80,speedMod:2,price:1658},
+        {id:18,name:'Lockheed Avenger',weight:700,maxWeight:3500,cargoHoldSize:375,fuelTankSize:140,speedMod:3,price:2809},
+        {id:19,name:'Boeing Blunderbuss',weight:750,maxWeight:3750,cargoHoldSize:250,fuelTankSize:150,speedMod:1,price:2000},
+
+        {id:20,name:'Bristol Buckingham',weight:650,maxWeight:3250,cargoHoldSize:625,fuelTankSize:130,speedMod:1,price:4000},
+        {id:21,name:'TNCA Mexico',weight:550,maxWeight:2750,cargoHoldSize:500,fuelTankSize:110,speedMod:2,price:4766},
+        {id:22,name:'Sikorsky Manhattan',weight:650,maxWeight:3250,cargoHoldSize:625,fuelTankSize:130,speedMod:2,price:5618},
+        {id:23,name:'Ford Bison',weight:450,maxWeight:2250,cargoHoldSize:375,fuelTankSize:90,speedMod:2,price:2713},
+        {id:24,name:'Junkers Adler',weight:400,maxWeight:2000,cargoHoldSize:375,fuelTankSize:80,speedMod:3,price:3317},
+        {id:25,name:'Fairchild Alamo',weight:550,maxWeight:2750,cargoHoldSize:375,fuelTankSize:110,speedMod:2,price:3317},
+        {id:26,name:'Tupolev Prigovor',weight:600,maxWeight:3000,cargoHoldSize:500,fuelTankSize:120,speedMod:1,price:4000},
+        {id:27,name:'Douglas Boomer',weight:700,maxWeight:3500,cargoHoldSize:500,fuelTankSize:140,speedMod:2,price:5618},
+        {id:28,name:'Boeing Skyfort',weight:750,maxWeight:3750,cargoHoldSize:625,fuelTankSize:150,speedMod:2,price:6561},
+
+        {id:29,name:'Vickers R-class',weight:5500,maxWeight:27500,cargoHoldSize:5000,fuelTankSize:1100,speedMod:1,price:41462},
+        {id:30,name:'Eckener Liberty-class',weight:7000,maxWeight:35000,cargoHoldSize:6250,fuelTankSize:1400,speedMod:3,price:94972},
+        {id:31,name:'Goodyear Akron-class',weight:6000,maxWeight:30000,cargoHoldSize:6250,fuelTankSize:1200,speedMod:2,price:70226},
+        {id:32,name:'Zeppelin Graf-class',weight:6000,maxWeight:30000,cargoHoldSize:5000,fuelTankSize:1200,speedMod:3,price:82010},
+        {id:33,name:'Texaco Lone Star-class',weight:4500,maxWeight:22500,cargoHoldSize:3750,fuelTankSize:900,speedMod:3,price:41462},
+        {id:34,name:'Osoaviahim Gorky-class',weight:4500,maxWeight:22500,cargoHoldSize:3750,fuelTankSize:900,speedMod:2,price:41462},
+        {id:35,name:'Hughes Hollywood-class',weight:4500,maxWeight:22500,cargoHoldSize:3750,fuelTankSize:900,speedMod:3,price:50000},
+        {id:36,name:'Boeing Pacific-class',weight:4000,maxWeight:20000,cargoHoldSize:3750,fuelTankSize:800,speedMod:3,price:41462},
+    ];
 
     var city_prod = {
         124:[
@@ -6885,7 +6927,12 @@ function getDB(){
             }
         });
     });
-
+    
+    // create aircraft types
+    aircraft_types_raw.forEach(function(a){
+        AIRCRAFTTYPES.set(new AircraftType(a.id, a.name, a.weight, a.maxWeight, a.cargoHoldSize, a.fuelTankSize, a.speedMod, a.price));
+    });
+    
     
     // create player & aircraft data
     var i = 0;
@@ -6932,7 +6979,7 @@ function getDB(){
                 ' '+
                 aircraftNames[1][1][Math.floor(Math.random()*aircraftNames[1][1].length)];
         }
-        AIRCRAFTS.set( new Aircraft(parseInt(p.id), a_name, p.fuel, p.speed, p.position, p.destination, p.id) );
+        AIRCRAFTS.set( new Aircraft(parseInt(p.id), a_name, p.fuel, p.speed, p.position, p.destination, p.id, true, 1) );
     });
 }
 

@@ -12,14 +12,14 @@
                 <div id="top-menu">
                     <div id="worldMarketBtn" class="menuBtn">World Market</div>
                 </div>
-                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{cityScreen.city.id}}">
+                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}">
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
-                            <div id="cityScreen-country" style="{{cityScreen.country.css}}">
-                                <img id="cityScreen-country-flag" ng-src="{{cityScreen.country.flagUrl}}">
-                                <div id="cityScreen-country-name">{{cityScreen.country.name}}</div>
+                            <div id="cityScreen-country" style="{{country.css}}">
+                                <img id="cityScreen-country-flag" ng-src="{{country.flagUrl}}">
+                                <div id="cityScreen-country-name">{{country.name}}</div>
                             </div>
-                            <div id="cityScreen-marketBtn" class="cityScreen-btn">
+                            <div id="cityScreen-marketBtn" class="cityScreen-btn" ng-click="openCityMarket()">
                                 Market
                                 <div id="cityScreen-sellAllBtn" class="cityScreen-btn cityScreen-subBtn">Sell All</div>
                             </div>
@@ -27,14 +27,46 @@
                                 Hangar
                                 <div id="cityScreen-refuelBtn" class="cityScreen-btn cityScreen-subBtn">Refuel</div>
                             </div>
-                            <div id="cityScreen-cityhallBtn" class="cityScreen-btn" disabled>City Hall</div>
-                            <div id="cityScreen-speakeasyBtn" class="cityScreen-btn" disabled>Speakeasy</div>
+                            <div id="cityScreen-cityhallBtn" class="cityScreen-btn" disabled="true">City Hall</div>
+                            <div id="cityScreen-speakeasyBtn" class="cityScreen-btn" disabled="true">Speakeasy</div>
                             <div id="cityScreen-leaveBtn" class="cityScreen-btn">Leave city</div>
                         </div>
                         <div id="cityScreenRight">
-                            <div id="cityScreen-name">{{cityScreen.city.name}}</div>
-                            <div id="cityScreen-pop">Pop. {{cityScreen.city.pop}}</div>
-                            <div id="cityScreen-content" class="scrollable"></div>
+                            <div id="cityScreen-name">{{city.name}}</div>
+                            <div id="cityScreen-pop">Pop. {{city.pop}}</div>
+                            <div id="cityScreen-content" class="scrollable">
+                                <div id="cityMarket" class="cityScreen-contentItem" ng-hide="!market.isActive">
+                                    <h1>Market</h1>
+                                    <table id="cityScreenMarket" class="tablesorter">
+                                        <thead>
+                                            <tr>
+                                                <td class="borderRight" colspan="2">Commodity</td>
+                                                <td class="borderRight" colspan="3">City</td><td colspan="2">You</td>
+                                            </tr>
+                                            <tr>
+                                                <th>Name</th>
+                                                <th class="borderRight">Avg.</th>
+                                                <th>Buys for</th>
+                                                <th>Sells for</th>
+                                                <th class="borderRight">Stock</th>
+                                                <th>Value</th>
+                                                <th>Amount</th>
+                                            </tr>
+                                        </thead>
+                                        <tbody>
+                                            <tr ng-repeat="co in market.commodities" co_id="{{co.id}}">
+                                                <td>{{co.name}}</td>
+                                                <td class="borderRight">{{co.basePrice}}</td>
+                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" action="{{co.sellAction}}">{{co.buyPrice}}</td>
+                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled" action="{{co.buyAction}}">{{co.salePrice}}</td>
+                                                <td class="borderRight">{{co.cityAmount}}</td>
+                                                <td>{{co.playerValue}}</td>
+                                                <td>{{co.playerAmount}}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
                         </div>
                     </div>
                 </div>

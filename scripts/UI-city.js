@@ -1,40 +1,146 @@
 
 
 app.controller('CityUIController', function UIController($scope) {
-    var scopeSources = [
-        'COUNTRIES', 'CITIES', 'COMMODITIES', 'PLAYERS', 'AIRCRAFTS',
-        'AIRCRAFTTYPES', 'game_settings', 'player_settings',
-    ];
-    scopeSources.forEach(function(source){
-        $scope[source] = game_data[source];
-    });
 
-    $scope.cityScreen = {
-        country: {
-            name: '',
-            flagUrl: '',
-            css: '',
-        },
-        city: {
-            name: '',
-            pop: 0,
-        },
+    $scope.country = {
+        name: '',
+        flagUrl: '',
+        css: '',
     };
+    $scope.city = {
+        name: '',
+        pop: 0,
+    };
+    $scope.market = {
+        isActive: false,
+        commodities: []
+    }
+
     $(document).on('cityArrive', function(e, data){
-        if(data.player_id != $scope.player_settings.id) return;
-        var city = $scope.CITIES.get(data.city_id);
+        if(data.player_id != game_data.player_settings.id) return;
+        var city = game_data.CITIES.get(data.city_id);
         var country = city.getCountry();
 
-        $scope.cityScreen.country.name = country.name;
-        $scope.cityScreen.country.flagUrl = getFlagUrl(country.flag_file);
-        $scope.cityScreen.country.css = 'color: '+country.color2+'; background: '+country.color1+';';
-        $scope.cityScreen.city.id = city.id;
-        $scope.cityScreen.city.name = city.name;
-        $scope.cityScreen.city.pop = city.population.city;
+        $scope.country.name = country.name;
+        $scope.country.flagUrl = getFlagUrl(country.flag_file);
+        $scope.country.css = 'color:'+country.color2+';background:'+country.color1;
+        $scope.city.id = city.id;
+        $scope.city.name = city.name;
+        $scope.city.pop = city.population.city;
 
-        $scope.$apply()
+        $scope.$apply();
+        $('#cityScreen').fadeIn();
     });
 
+
+
+    ///// CITY MARKET /////
+
+    $scope.openCityMarket = function(){
+        $scope.market.isActive = true;
+        updateCityMarket();
+    }
+
+    function closeCityMarket(){
+        $scope.market.isActive = false;
+        $scope.$apply;
+    }
+
+    function updateCityMarket(){
+        if(! $scope.market.isActive) return;
+        var city = game_data.CITIES.get($scope.city.id);
+        var player = game_data.PLAYERS.get(game_data.player_settings.id);
+        var aircraft = player.getAircraft();
+
+        $scope.market.commodities = [];
+
+
+        city.market.forEach(function(co){
+
+            var scopeCommodity = {
+                id: co.id,
+                name: co.name,
+                basePrice: getMoney(game_data.COMMODITIES.get(co.id).base_price, true),
+                buyCss: '',
+                sellCss: '',
+                buyAction: '',
+                sellAction: '',
+                buyDisabled: false,
+                sellDisabled: false,
+            };
+
+            // set up data
+            var dataCityAmount = city.market.get(co.id).amount;
+            var dataCityModifier = city.market.get(co.id).modifier;
+            var dataCityBuyPrice = city.getCommodityBuyPrice(co).message;
+            var dataCitySalePrice = city.getCommoditySalePrice(co).message;
+            var buyCss = '';
+            var sellCss = '';
+
+            // does the city have this commodity -> can buy?
+            if(dataCityAmount != 0){
+                var canBuy = true;
+
+                if(dataCityModifier > 1){
+                    buyCss = 'color: rgb('+Math.round((dataCityModifier-1)*128)+',0,0)';
+                } else {
+                    buyCss = 'color: rgb(0,'+Math.round((dataCityModifier-1)*-256)+',0)';
+                }
+            } else {
+                var canBuy = false;
+            }
+
+            // does the aircraft have this commodity -> can sell?
+            if(aircraft.getCargo(co).success){
+                var canSell = true;
+                var dataPlayerValue = aircraft.getCargo(co).message.valuePerItem;
+
+                if(dataCityModifier > 1){
+                    sellCss = 'color: rgb(0,'+Math.round((dataCityModifier-1)*128)+',0)';
+                } else {
+                    sellCss = 'color: rgb('+Math.round((dataCityModifier-1)*-256)+',0,0)';
+                }
+            } else {
+                var canSell = false;
+            }
+
+            // add data to to scopeCommodity
+            scopeCommodity.buyPrice = getMoney(dataCityBuyPrice, true);
+            scopeCommodity.salePrice = getMoney(dataCitySalePrice, true);
+
+            if(canSell){
+                scopeCommodity.playerValue = getMoney(dataPlayerValue, true);
+                scopeCommodity.playerAmount = aircraft.getCargo(co).message.amount;
+                scopeCommodity.sellCss = sellCss;
+                scopeCommodity.sellAction = 'sell';
+            } else {
+                scopeCommodity.playerValue = 0;
+                scopeCommodity.playerAmount = 0;
+                scopeCommodity.sellDisabled = true;
+            }
+
+            if(canBuy){
+                scopeCommodity.cityAmount = dataCityAmount;
+                scopeCommodity.buyAction = 'buy';
+                scopeCommodity.buyCss = buyCss;
+            } else {
+                scopeCommodity.cityAmount = 0;
+                scopeCommodity.buyDisabled = true;
+            }
+
+            // push it to the market
+            $scope.market.commodities.push(scopeCommodity);
+
+        // end city market foreach
+        });
+
+        $scope.$apply();
+
+    // end updateCityMarket
+    }
+
+    $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);
+    $(document).on('longScreenUpdate', updateCityMarket);
 });
 
 
@@ -43,17 +149,18 @@ app.controller('CityUIController', function UIController($scope) {
 
 // draws the city screen on cityArrive
 function drawCityScreen(e, data){
+    return;
     if(data.aircraft_id != game_data.player_settings.id) return;
     var city = game_data.CITIES.get(data.city_id);
     var country = city.getCountry();
 
     $('#cityScreen-content').html('');
-    $('#cityScreen').fadeIn();
 }
 $(document).on('cityArrive', drawCityScreen);
 
 // draws the market table on cityScreen marketBtn click
 function drawCityScreenMarket(){
+    return;
     var base = $('#cityScreen-content');
     base.hide().html('');
 
@@ -95,6 +202,7 @@ $('#cityScreen-marketBtn').click(drawCityScreenMarket);
 
 // sets the cityScreenMarket values every 1000ms
 function setCityMarketScreenData(){
+    return;
 
     // check the market exists
     if($('#cityScreenMarket').length == 0) return;

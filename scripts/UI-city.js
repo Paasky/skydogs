@@ -1,6 +1,7 @@
 
 
 app.controller('CityUIController', function UIController($scope) {
+    $scope.isActive = false;
 
     $scope.country = {
         name: '',
@@ -14,10 +15,16 @@ app.controller('CityUIController', function UIController($scope) {
     $scope.market = {
         isActive: false,
         commodities: []
-    }
+    };
+
+
+    ///// CITY SCREEN /////
 
     $(document).on('cityArrive', function(e, data){
         if(data.player_id != game_data.player_settings.id) return;
+
+        $scope.isActive = true;
+
         var city = game_data.CITIES.get(data.city_id);
         var country = city.getCountry();
 
@@ -29,7 +36,14 @@ app.controller('CityUIController', function UIController($scope) {
         $scope.city.pop = city.population.city;
 
         $scope.$apply();
-        $('#cityScreen').fadeIn();
+    });
+
+    $(document).on('cityLeave', function(e, data){
+        if(data.player_id != game_data.player_settings.id) return;
+
+        $scope.isActive = false;
+
+        $scope.$apply();
     });
 
 
@@ -139,7 +153,31 @@ app.controller('CityUIController', function UIController($scope) {
     // end updateCityMarket
     }
 
+    // close the market by clicking on city screen buttons,
+    // except for the market button itself of course
     $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);
+
+
+
+    ///// CITY MARKET SHOP /////
+
+    $scope.openCityMarketShop = function(){
+        $scope.market.shop.isActive = true;
+        updateCityMarketShop();
+    }
+
+    function closeCityMarketShop(){
+        $scope.market.shop.isActive = false;
+        $scope.$apply;
+    }
+
+    function updateCityMarketShop(){
+        if(! $scope.market.isActive) return;
+
+    }
+
+
+    // update the data every longScreenUpdate
     $(document).on('longScreenUpdate', updateCityMarket);
 });
 

@@ -12,7 +12,7 @@
                 <div id="top-menu">
                     <div id="worldMarketBtn" class="menuBtn">World Market</div>
                 </div>
-                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}">
+                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}" ng-hide="!isActive">
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
                             <div id="cityScreen-country" style="{{country.css}}">

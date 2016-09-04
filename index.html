@@ -9,8 +9,24 @@
             <div id="loading-message" class="full-size"><span>Loading <span id="loading-message-type">Libraries</span></span></div>
             <div class="full-size">
                 <div id="map-canvas" class="full-size" />
-                <div id="top-menu">
-                    <div id="worldMarketBtn" class="menuBtn">World Market</div>
+                <div id="top-menu" class="ui-elem">
+                    <div id="top-menu-icons" class="ui-item-tl">
+                        <i id="menu-toggle" class="fa fa-bars ui-btn" aria-hidden="true"></i>
+                        <i id="search-toggle" class="fa fa-search ui-btn" aria-hidden="true"></i>
+                        <input id="search-field">
+                        <div id="game-menu">
+                            <i id="settings-btn" class="fa fa-cog ui-btn" aria-hidden="true">Settings</i>
+                            <i id="quit-btn" class="fa fa-sign-out ui-btn" aria-hidden="true">Quit</i>
+                        </div>
+                    </div>
+                    <div id="map-tab" class="ui-item-tr view-tab ui-btn active">Map</div>
+                    <div id="market-tab" class="ui-item-tr view-tab ui-btn">Market</div>
+                    <div id="profile-tab" class="ui-item-tr view-tab ui-btn">Profile</div>
+                </div>
+                <div id="bottom-menu" class="ui-elem ui-item-br">
+                    <i id="speed-btn" class="fa fa-tachometer ui-btn" aria-hidden="true">260 km/h</i>
+                    <i id="route-btn" class="fa fa-compass ui-btn" aria-hidden="true">13 min</i>
+                    <i id="aircraft-btn" class="fa fa-plane ui-btn" aria-hidden="true">Jumping Jenny</i>
                 </div>
                 <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}" ng-hide="!isActive">
                     <div id="cityScreen-container" class="center-xy">
@@ -70,7 +86,18 @@
                         </div>
                     </div>
                 </div>
-                <div id="logger"></div>
+                <div id="notifications" class="ui-elem ui-item-bl">
+                    <div class="notification ui-btn">
+                        <i class="fa fa-exclamation" aria-hidden="true"></i>
+                        This is areally long message saying something that shouldn't all be visible
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </div>
+                    <div class="notification ui-btn">
+                        <i class="fa fa-info" aria-hidden="true"></i>
+                        This is areally long message saying something that shouldn't all be visible
+                        <i class="fa fa-times" aria-hidden="true"></i>
+                    </div>
+                </div>
             </div>
         </div>
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>

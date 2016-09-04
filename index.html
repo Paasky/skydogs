@@ -43,11 +43,11 @@
                     <div>85 %</div>
                     <i class="fa fa-minus ui-btn" aria-hidden="true"></i>
                 </div>
-                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}" ng-hide="!isActive">
+                <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}">
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
-                            <div id="cityScreen-country" style="{{country.css}}">
-                                <img id="cityScreen-country-flag" ng-src="{{getFlagUrl(country.flag_file)}}">
+                            <div id="cityScreen-country" style="{{css}}">
+                                <img id="cityScreen-country-flag" ng-src="{{flagUrl}}">
                                 <div id="cityScreen-country-name">{{country.name}}</div>
                             </div>
                             <div id="cityScreen-marketBtn" class="cityScreen-btn" ng-click="openCityMarket()">
@@ -88,8 +88,8 @@
                                             <tr ng-repeat="co in market.commodities.getAll()" co_id="{{co.id}}">
                                                 <td>{{co.name}}</td>
                                                 <td class="borderRight">{{co.basePrice}}</td>
-                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openMarketShop(co.id)">{{co.buyPrice}}</td>
-                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openMarketShop(co.id)">{{co.salePrice}}</td>
+                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openCityMarketShop(co.id)">{{co.buyPrice}}</td>
+                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openCityMarketShop(co.id)">{{co.salePrice}}</td>
                                                 <td class="borderRight">{{co.cityAmount}}</td>
                                                 <td>{{co.playerValue}}</td>
                                                 <td>{{co.playerAmount}}</td>

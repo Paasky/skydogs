@@ -10,11 +10,15 @@ $(document).mousemove(function(event) {
 // fly to a city
 function flyToCityId(){
     var cityId = $(this).attr('flyToCityId');
-    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', cityId)));
+    var setReply = userSetDestination('city', cityId);
+    if(!setReply.success){ var type='exclamation'; }
+    NotificationFactory.create(setReply.message, type);
 }
 
 $(document).on('cityClick', function(e, city){
-    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', city.id)));
+    var setReply = userSetDestination('city', city.id);
+    if(!setReply.success){ var type='exclamation'; }
+    NotificationFactory.create(setReply.message, type);
 });
 
 

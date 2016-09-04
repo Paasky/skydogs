@@ -298,6 +298,12 @@ $(document).on('cityLeave', function(e, aircraft_id){
 function onScreenUpdate(){
     tick(game_data.AIRCRAFTS, game_data.player_settings.tick_length);
     drawAircrafts();
+    if(game_data.player_settings.screen_settings.follow){
+        map.panTo(
+            game_data.PLAYERS.get(game_data.player_settings.id).getAircraft().position,
+            {duration:0}
+        );
+    }
     $(document).trigger('screenUpdate');
     if(screenTickCounter%10 == 0) $(document).trigger('longScreenUpdate');
     screenTickCounter++;

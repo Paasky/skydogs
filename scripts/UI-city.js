@@ -1,6 +1,7 @@
 
 
 app.controller('CityUIController', function UIController($scope) {
+    $scope.isActive = false;
 
     $scope.city = game_data.CITIES.get(1);
     $scope.country = $scope.city.getCountry();
@@ -28,7 +29,14 @@ app.controller('CityUIController', function UIController($scope) {
         $scope.country = city.getCountry();
 
         $scope.$apply();
-        $('#cityScreen').fadeIn();
+    });
+
+    $(document).on('cityLeave', function(e, data){
+        if(data.player_id != game_data.player_settings.id) return;
+
+        $scope.isActive = false;
+
+        $scope.$apply();
     });
 
 
@@ -138,7 +146,7 @@ app.controller('CityUIController', function UIController($scope) {
 
     $scope.openCityMarketShop = function(){
         $scope.market.shop.isActive = true;
-        updateCityMarket();
+        updateCityMarketShop();
     }
 
     function closeCityMarketShop(){

@@ -1,3 +1,52 @@
+
+
+app.controller('MenuUIController', function UIController($scope) {
+    $scope.toggleMenu = function(){
+        $('#game-menu').slideToggle();
+    };
+    $scope.toggleSearch = function(){
+        $('#search-field').slideToggle();
+    };
+});
+
+app.controller('InfoUIController', function UIController($scope) {
+
+});
+
+app.controller('MapUIController', function UIController($scope) {
+    var panAmount = 200;
+    $scope.panN = function(){
+        map.panBy([0,-1*panAmount]);
+    };
+    $scope.panS = function(){
+        map.panBy([0,panAmount]);
+    };
+    $scope.panW = function(){
+        map.panBy([-1*panAmount,0]);
+    };
+    $scope.panE = function(){
+        map.panBy([panAmount,0]);
+    };
+    $scope.toggleFollowUser = function(){
+        game_data.player_settings.screen_settings.follow = !game_data.player_settings.screen_settings.follow;
+        if(game_data.player_settings.screen_settings.follow){
+            $('#map-controls .fa-plane').addClass('active');
+        } else {
+            $('#map-controls .fa-plane').removeClass('active');
+        }
+    };
+    $scope.zoomIn = function(){
+        map.zoomIn();
+    };
+    $scope.zoomOut = function(){
+        map.zoomOut();
+    };
+});
+
+app.controller('AircraftUIController', function UIController($scope) {
+
+});
+
 // create the world market window
 function drawWorldMarketWindow(){
     var header = 'World Market';

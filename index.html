@@ -9,10 +9,10 @@
             <div id="loading-message" class="full-size"><span>Loading <span id="loading-message-type">Libraries</span></span></div>
             <div class="full-size">
                 <div id="map-canvas" class="full-size" />
-                <div id="top-menu" class="ui-elem">
+                <div ng-controller="MenuUIController" id="top-menu" class="ui-elem">
                     <div id="top-menu-icons" class="ui-item-tl">
-                        <i id="menu-toggle" class="fa fa-bars ui-btn" aria-hidden="true"></i>
-                        <i id="search-toggle" class="fa fa-search ui-btn" aria-hidden="true"></i>
+                        <i ng-click="toggleMenu()" id="menu-toggle" class="fa fa-bars ui-btn" aria-hidden="true"></i>
+                        <i ng-click="toggleSearch()" id="search-toggle" class="fa fa-search ui-btn" aria-hidden="true"></i>
                         <input id="search-field">
                         <div id="game-menu">
                             <i id="settings-btn" class="fa fa-cog ui-btn" aria-hidden="true">Settings</i>
@@ -23,10 +23,25 @@
                     <div id="market-tab" class="ui-item-tr view-tab ui-btn">Market</div>
                     <div id="profile-tab" class="ui-item-tr view-tab ui-btn">Profile</div>
                 </div>
-                <div id="bottom-menu" class="ui-elem ui-item-br">
+                <div ng-controller="InfoUIController" id="bottom-menu" class="ui-elem ui-item-br">
                     <i id="speed-btn" class="fa fa-tachometer ui-btn" aria-hidden="true">260 km/h</i>
                     <i id="route-btn" class="fa fa-compass ui-btn" aria-hidden="true">13 min</i>
                     <i id="aircraft-btn" class="fa fa-plane ui-btn" aria-hidden="true">Jumping Jenny</i>
+                </div>
+                <div ng-controller="MapUIController" id="map-controls" class="ui-elem ui-item-ml">
+                    <i ng-click="panN()" class="fa fa-angle-up ui-btn" aria-hidden="true"></i>
+                    <i ng-click="panS()" class="fa fa-angle-down ui-btn" aria-hidden="true"></i>
+                    <i ng-click="panW()" class="fa fa-angle-left ui-btn" aria-hidden="true"></i>
+                    <i ng-click="panE()" class="fa fa-angle-right ui-btn" aria-hidden="true"></i>
+                    <i ng-click="toggleFollowUser()" class="fa fa-plane ui-btn" aria-hidden="true"></i>
+                    <i ng-click="zoomIn()" class="fa fa-plus ui-btn" aria-hidden="true"></i>
+                    <i ng-click="zoomOut()" class="fa fa-minus ui-btn" aria-hidden="true"></i>
+                </div>
+                <div ng-controller="AircraftUIController" id="aircraft-controls" class="ui-elem ui-item-mr">
+                    <div class="gray">Power</div>
+                    <i class="fa fa-plus ui-btn" aria-hidden="true"></i>
+                    <div>85 %</div>
+                    <i class="fa fa-minus ui-btn" aria-hidden="true"></i>
                 </div>
                 <div ng-controller="CityUIController" id="cityScreen" class="full-size" city_id="{{city.id}}" ng-hide="!isActive">
                     <div id="cityScreen-container" class="center-xy">

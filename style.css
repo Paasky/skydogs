@@ -56,6 +56,11 @@ select, input, textarea {
     color: #aaa;
     font-size: 0.75em;
 }
+.fa.active {
+    box-shadow: 0px 0px 0.5em 0px #333;
+    border-radius: 100%;
+    background: #fff;
+}
 
 /* attrs */
 [disabled="true"], [disabled="disabled"] {
@@ -65,6 +70,13 @@ select, input, textarea {
     cursor: not-allowed !important;
 }
 
+
+/* fontawseome fixes */
+.fa-plane:before {
+    position: relative;
+    top: 0.05em;
+    right: 0.02em;
+}
 
 
 /* APP */
@@ -153,6 +165,8 @@ select, input, textarea {
 
 .ui-item-tl,
 .ui-item-tr,
+.ui-item-ml,
+.ui-item-mr,
 .ui-item-bl,
 .ui-item-br {
     background: #fff;
@@ -166,6 +180,16 @@ select, input, textarea {
 .ui-item-tr {
     border-top: none;
     border-right: none;
+}
+.ui-item-ml {
+    border-left: none;
+    top: 50%;
+    transform: translateY(-50%);
+}
+.ui-item-mr {
+    border-right: none;
+    top: 50%;
+    transform: translateY(-50%);
 }
 .ui-item-bl {
     border-bottom: none;
@@ -253,6 +277,61 @@ select, input, textarea {
             position: relative;
         }
 
+/* map controls */
+#map-controls {
+    font-size: 2em;
+    width: 4em;
+    height: 7em;
+    text-align: center;
+}
+    #map-controls>.fa {
+        width: 1em;
+        height: 1em;
+        position: absolute;
+    }
+
+    #map-controls .fa-angle-up {
+        top: 1.5em;
+        left: 1.5em;
+    }
+    #map-controls .fa-angle-down {
+        top: 4.5em;
+        left: 1.5em;
+    }
+    #map-controls .fa-angle-left {
+        top: 3em;
+        left: 0em;
+    }
+    #map-controls .fa-angle-right {
+        top: 3em;
+        left: 3em;
+    }
+    #map-controls .fa-plane {
+        top: 3em;
+        left: 1.5em;
+    }
+    #map-controls .fa-plus {
+        top: 0.5em;
+        left: 1.5em;
+    }
+    #map-controls .fa-minus {
+        top: 5.75em;
+        left: 1.5em;
+    }
+
+/* aircraft controls */
+#aircraft-controls {
+    font-size: 2em;
+    right: 0;
+    padding: 0.5em;
+    text-align: center;
+}
+    #aircraft-controls .fa-plus {
+        margin-bottom: 0.5em;
+    }
+    #aircraft-controls .fa-minus {
+        margin-top: 0.5em;
+    }
 
 /* notifications */
 #notifications {

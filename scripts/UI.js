@@ -137,6 +137,29 @@ var WindowFactory = {
     }
 }
 
+var NotificationFactory = {
+    create: function(text, type, duration){
+        if(!type) type = 'info';
+        if(!duration) duration = 5000;
+
+        var output =
+            '<div class="notification ui-btn">'+
+                '<i class="fa fa-'+type+'" aria-hidden="true"></i>'+
+                text+
+                '<i class="fa fa-times" aria-hidden="true"></i>'+
+            '</div>';
+        var newNotification = $(output);
+        $('#notifications').prepend(newNotification);
+        newNotification.hide().slideDown();
+        setTimeout(function(){
+            newNotification.slideUp(
+                1000,
+                function(){ $(this).remove(); }
+            );
+        }, duration);
+    },
+}
+
 $(document).keypress(function(e){
   if (e.keyCode === 13) $('.window.active [action="confirm"]').last().click();     // enter
   if (e.keyCode === 27) $('.window.active [action="close"]').last().click();   // esc

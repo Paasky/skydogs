@@ -10,11 +10,11 @@ $(document).mousemove(function(event) {
 // fly to a city
 function flyToCityId(){
     var cityId = $(this).attr('flyToCityId');
-    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', cityId)));
+    NotificationFactory.create(JSON.stringify(userSetDestination('city', cityId)));
 }
 
 $(document).on('cityClick', function(e, city){
-    WindowFactory.createInfo(JSON.stringify(userSetDestination('city', city.id)));
+    NotificationFactory.create(JSON.stringify(userSetDestination('city', city.id)));
 });
 
 

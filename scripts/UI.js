@@ -149,12 +149,7 @@ var NotificationFactory = {
                 '<i class="fa fa-times" aria-hidden="true"></i>'+
             '</div>';
         var newNotification = $(output);
-        newNotification.find('.fa-times').click(function(){
-            $(this).parent().slideUp(
-                1000,
-                function(){ $(this).parent().remove(); }
-            );
-        });
+        newNotification.find('.fa-times').click(function(){ $(this).parent().remove(); });
         $('#notifications').prepend(newNotification);
         newNotification.hide().slideDown();
         setTimeout(function(){

@@ -109,13 +109,13 @@ select, input, textarea {
     text-align: center;
 }
 .city_marker {
-    z-index: 35;
+    z-index: 25;
 }
 .aircraft_marker {
-    z-index: 45;
+    z-index: 33;
 }
 .user_marker {
-    z-index: 90;
+    z-index: 36;
 }
     .marker_image {
         width: 100%;
@@ -137,10 +137,10 @@ select, input, textarea {
         border: 2px #333 solid;
     }
     .city_label {
-        z-index: 30;
+        z-index: 20;
     }
     .aircraft_label {
-        z-index: 40;
+        z-index: 30;
         bottom: -2.5em;
     }
         .inner_label {
@@ -160,7 +160,7 @@ select, input, textarea {
 /* UI */
 .ui-elem {
     position: absolute;
-    z-index: 36;
+    z-index: 40;
 }
 
 .ui-item-tl,
@@ -211,8 +211,8 @@ select, input, textarea {
     width: 100%;
     top: 0;
     right: 0;
-    z-index: 120;
     font-size: 2em;
+    z-index: 50;
 }
     #top-menu-icons {
         position: absolute;
@@ -231,8 +231,8 @@ select, input, textarea {
         }
             #game-menu>i {
                 display: block;
-                padding: 0.1em;
-                margin: 0.1em;
+                padding: 0.2em 0.1em;
+                margin: 0.2em;
             }
                 #game-menu>i:before {
                     margin-right: 0.2em;
@@ -343,6 +343,8 @@ select, input, textarea {
         height: 2em;
         position: relative;
         margin: 0.5em 0.2em;
+        padding-right: 2.1em;
+        white-space: nowrap;
         border-bottom: 1px #ddd solid;
     }
     .notification:last-child {
@@ -378,13 +380,13 @@ select, input, textarea {
     border-radius: 6px;
     font-size: 1.5em;
     max-width: 90%;
-    z-index: 110;
+    z-index: 46;
     max-height: 90%;
     overflow: hidden;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 }
 .window.active {
-    z-index: 115;
+    z-index: 47;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,1);
 }
     .windowHeader {
@@ -452,7 +454,7 @@ select, input, textarea {
     display: none;
     position: absolute;
     top: 0;
-    z-index: 100;
+    z-index: 43;
     background: rgba(0,0,0,0.75);
 }
 #cityScreen-container {

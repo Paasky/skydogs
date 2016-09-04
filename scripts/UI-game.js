@@ -5,7 +5,7 @@ app.controller('MenuUIController', function UIController($scope) {
         $('#game-menu').slideToggle();
     };
     $scope.toggleSearch = function(){
-        $('#search-field').slideToggle();
+        $('#search-field').slideToggle().focus();
     };
 });
 

@@ -16,7 +16,7 @@
                     <div id="cityScreen-container" class="center-xy">
                         <div id="cityScreenLeft">
                             <div id="cityScreen-country" style="{{country.css}}">
-                                <img id="cityScreen-country-flag" ng-src="{{country.flagUrl}}">
+                                <img id="cityScreen-country-flag" ng-src="{{getFlagUrl(country.flag_file)}}">
                                 <div id="cityScreen-country-name">{{country.name}}</div>
                             </div>
                             <div id="cityScreen-marketBtn" class="cityScreen-btn" ng-click="openCityMarket()">
@@ -33,7 +33,7 @@
                         </div>
                         <div id="cityScreenRight">
                             <div id="cityScreen-name">{{city.name}}</div>
-                            <div id="cityScreen-pop">Pop. {{city.pop}}</div>
+                            <div id="cityScreen-pop">Pop. {{city.population.city}}</div>
                             <div id="cityScreen-content" class="scrollable">
                                 <div id="cityMarket" class="cityScreen-contentItem" ng-hide="!market.isActive">
                                     <h1>Market</h1>
@@ -54,11 +54,11 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="co in market.commodities" co_id="{{co.id}}">
+                                            <tr ng-repeat="co in market.commodities.getAll()" co_id="{{co.id}}">
                                                 <td>{{co.name}}</td>
                                                 <td class="borderRight">{{co.basePrice}}</td>
-                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" action="{{co.sellAction}}">{{co.buyPrice}}</td>
-                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled" action="{{co.buyAction}}">{{co.salePrice}}</td>
+                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openMarketShop(co.id)">{{co.buyPrice}}</td>
+                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openMarketShop(co.id)">{{co.salePrice}}</td>
                                                 <td class="borderRight">{{co.cityAmount}}</td>
                                                 <td>{{co.playerValue}}</td>
                                                 <td>{{co.playerAmount}}</td>
@@ -66,11 +66,58 @@
                                         </tbody>
                                     </table>
                                 </div>
+                                <div id="cityMarketShop" class="window center-xy" ng-hide="!market.shop.isActive">
+                                    <div class="windowHeader">
+                                        <select id="shopTypeSelector">
+                                            <option selected="{{market.shop.buySelected}}" value="buy">Buy</option>
+                                            <option selected="{{market.shop.sellSelected}}" value="sell">Sell</option>
+                                        </select>
+                                        <select id="shopCommoditySelector">
+                                            <option ng-repeat="co in market.commodities.getAll()" selected="{{co.selected}}" value="{{co.id}}">{{co.name}}</option>
+                                        </select>
+                                        <span class="windowClose" action="cancel">x</span>
+                                    </div>
+                                    <div class="windowContent scrollable">
+                                        <table id="shopContent">
+                                            <tr>
+                                                <td>Amount:</td>
+                                                <td><input type=number id="shopAmount" value="1" min="1"></td>
+                                                <td class="gray">({maket.shop.amountAvailable}} available)</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Unit Price:</td>
+                                                <td>{{market.shop.commodityPrice}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Unit Weight:</td>
+                                                <td>{{market.shop.commodityWeight}} kg</td>
+                                            </tr>
+                                            <tr class="sum-row">
+                                                <td>Total Sum:</td>
+                                                <td>{{market.shop.priceSum}}</td>
+                                                <td rowspan="4"><span id="shopConfirm" class="windowButton" action="confirm"></span></td>
+                                            </tr>
+                                            <tr class="gray">
+                                                <td>Your money:</td>
+                                                <td>{{getMoney(player.money, true)}}</td>
+                                            </tr>
+                                            <tr>
+                                                <td>Total Weight:</td>
+                                                <td>{{market.shop.weightSum}} kg</td>
+                                            </tr>
+                                            <tr class="gray">
+                                                <td>Free space:</td>
+                                                <td>{{aircraft.getFreeCargoSpace()}} kg</td>
+                                            </tr>
+                                        </table>
+                                    </div>
+                                    <div class="windowFooter"></div>
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
-                <div id="logger"></div>
+                <div id="notifications"></div>
             </div>
         </div>
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>

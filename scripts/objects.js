@@ -196,7 +196,7 @@ function City(id, name, state_id, country_id, population, position) {
     this.getCommodityBuyPrice = function(commodity, amount){
         if(!commodity) return {success: false, message: 'City.getCommodityBuyPrice(): commodity is required'};
         
-        var price = this.market.get(commodity.id).price * 0.9;
+        var price = getMoney(this.market.get(commodity.id).price * 0.9);
         return { success: true, message: price };
     }
     this.getCommoditySalePrice = function(commodity, amount){

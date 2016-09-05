@@ -87,11 +87,11 @@
                                         <tbody>
                                             <tr ng-repeat="co in market.commodities.getAll()" co_id="{{co.id}}">
                                                 <td>{{co.name}}</td>
-                                                <td class="borderRight">{{co.basePrice}}</td>
-                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openCityMarketShop($event, 'sell')">{{co.buyPrice}}</td>
-                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openCityMarketShop($event, 'buy')">{{co.salePrice}}</td>
+                                                <td class="borderRight">{{getMoney(co.basePrice, true)}}</td>
+                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openCityMarketShop($event, 'sell')">{{getMoney(co.buyPrice, true)}}</td>
+                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openCityMarketShop($event, 'buy')">{{getMoney(co.salePrice, true)}}</td>
                                                 <td class="borderRight">{{co.cityAmount}}</td>
-                                                <td>{{co.playerValue}}</td>
+                                                <td>{{getMoney(co.playerValue, true)}}</td>
                                                 <td>{{co.playerAmount}}</td>
                                             </tr>
                                         </tbody>
@@ -103,7 +103,7 @@
                                             <option ng-selected="market.shop.buySelected" value="buy">Buy</option>
                                             <option ng-selected="market.shop.sellSelected" value="sell">Sell</option>
                                         </select>
-                                        <select id="shopCommoditySelector" ng-model="market.shop.commoditySelector" ng-options="co.name in market.commodities.getAll()">
+                                        <select id="shopCommoditySelector" ng-model="market.shop.commoditySelector" ng-options="co.name for co in market.commodities.getAll() track by co.id">
                                         </select>
                                         <span class="windowClose" ng-click="closeCityMarketShop()">x</span>
                                     </div>
@@ -116,7 +116,7 @@
                                             </tr>
                                             <tr>
                                                 <td>Unit Price:</td>
-                                                <td>{{market.shop.commodityPrice}}</td>
+                                                <td>{{getMoney(market.shop.commodityPrice, true)}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Unit Weight:</td>
@@ -124,7 +124,7 @@
                                             </tr>
                                             <tr class="sum-row">
                                                 <td>Total Sum:</td>
-                                                <td>{{market.shop.priceSum}}</td>
+                                                <td>{{getMoney(market.shop.priceSum, true)}}</td>
                                                 <td rowspan="4"><span id="shopConfirm" class="windowButton" ng-click="confirmCityMarketShop">{{market.shop.typeSelector}}</span></td>
                                             </tr>
                                             <tr class="gray">

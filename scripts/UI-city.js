@@ -21,7 +21,7 @@ app.controller('CityUIController', function UIController($scope) {
             commodityWeight: 0,
             priceSum: 0,
             weightSum: 0,
-            amount: 0,
+            amount: 1,
         },
     }
 
@@ -72,7 +72,8 @@ app.controller('CityUIController', function UIController($scope) {
             var scopeCommodity = {
                 id: co.id,
                 name: co.name,
-                basePrice: getMoney(co.base_price, true),
+                basePrice: co.base_price,
+                weight: co.weight,
                 buyCss: '',
                 sellCss: '',
                 buyDisabled: false,
@@ -117,11 +118,11 @@ app.controller('CityUIController', function UIController($scope) {
             }
 
             // add data to to scopeCommodity
-            scopeCommodity.buyPrice = getMoney(dataCityBuyPrice, true);
-            scopeCommodity.salePrice = getMoney(dataCitySalePrice, true);
+            scopeCommodity.buyPrice = dataCityBuyPrice;
+            scopeCommodity.salePrice = dataCitySalePrice;
 
             if(canSell){
-                scopeCommodity.playerValue = getMoney(dataPlayerValue, true);
+                scopeCommodity.playerValue = dataPlayerValue;
                 scopeCommodity.playerAmount = $scope.aircraft.getCargo(co).message.amount;
                 scopeCommodity.sellCss = sellCss;
             } else {
@@ -165,35 +166,25 @@ app.controller('CityUIController', function UIController($scope) {
 
     function updateCityMarketShop(commodityId, type){
 
-        if(commodityId) $scope.market.shop.commodityId = commodityId;
-        if(type) $scope.market.shop.type = type;
-        var commodity = $scope.market.commodities.get(commodityId);
-        $scope.market.shop.commoditySelector = commodity;
+        if(commodityId)
+            $scope.market.shop.commoditySelector = $scope.market.commodities.get(commodityId);
+        if(type) $scope.market.shop.typeSelector = type;
+        var co = $scope.market.shop.commoditySelector;
 
-        if($scope.market.shop.type=='buy'){
+        if($scope.market.shop.typeSelector=='buy'){
             $scope.market.shop.buySelected = true;
             $scope.market.shop.sellSelected = false;
-            var amountReply = $scope.city.getCommodity(commodity);
-            var priceReply = $scope.city.getCommoditySalePrice(commodity);
+            $scope.market.shop.commodityPrice = co.salePrice;
         } else {
             $scope.market.shop.buySelected = false;
             $scope.market.shop.sellSelected = true;
-            var amountReply = $scope.aircraft.getCargo(commodity);
-            var priceReply = $scope.city.getCommodityBuyPrice(commodity);
+            $scope.market.shop.commodityPrice = co.buyPrice;
         }
-        if(amountReply.success && priceReply.success){
-            $scope.market.shop.amountAvailable = amountReply.message.amount;
-            var commodityPrice = priceReply.message;
-        } else {
-            $scope.market.shop.amountAvailable = 0;
-            var commodityPrice = 0;
-        }
-        $scope.market.shop.commodityWeight = commodity.weight;
-        $scope.market.shop.commodityPrice = getMoney(commodityPrice, true);
-        $scope.market.shop.priceSum = getMoney(commodityPrice * $scope.market.shop.amount, true);
-        $scope.market.shop.weightSum = $scope.market.shop.commodityWeight * $scope.market.shop.amount;
+        $scope.market.shop.commodityWeight = co.weight;
+        $scope.market.shop.priceSum = getMoney($scope.market.shop.commodityPrice * $scope.market.shop.amount);
+        $scope.market.shop.weightSum = getMoney($scope.market.shop.commodityWeight * $scope.market.shop.amount);
 
-        $scope.$apply;
+        //$scope.$apply;
     }
 
     $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);

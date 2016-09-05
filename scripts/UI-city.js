@@ -7,6 +7,7 @@ app.controller('CityUIController', function UIController($scope) {
     $scope.country = $scope.city.getCountry();
     $scope.player = game_data.PLAYERS.get(game_data.player_settings.id);
     $scope.aircraft = $scope.player.getAircraft();
+    $scope.getMoney = getMoney;
 
     $scope.market = {
         isActive: false,
@@ -20,6 +21,7 @@ app.controller('CityUIController', function UIController($scope) {
             commodityWeight: 0,
             priceSum: 0,
             weightSum: 0,
+            amount: 0,
         },
     }
 
@@ -39,6 +41,8 @@ app.controller('CityUIController', function UIController($scope) {
         if($scope.aircraft.id != aircraftId) return;
 
         $scope.isActive = false;
+        $scope.market.isActive = false;
+        $scope.market.shop.isActive = false;
         $('#cityScreen').fadeOut();
 
         $scope.$apply();
@@ -55,11 +59,11 @@ app.controller('CityUIController', function UIController($scope) {
 
     function closeCityMarket(){
         $scope.market.isActive = false;
+        $scope.market.shop.isActive = false;
         $scope.$apply;
     }
 
     function updateCityMarket(){
-        if(! $scope.market.isActive) return;
 
         $scope.market.commodities = new ObjectHolder();
 
@@ -148,37 +152,54 @@ app.controller('CityUIController', function UIController($scope) {
 
     ///// CITY MARKET SHOP /////
 
-    $scope.openCityMarketShop = function(){
+    $scope.openCityMarketShop = function($event, type){
         $scope.market.shop.isActive = true;
-        updateCityMarketShop();
+        var coId = angular.element($event.currentTarget).parent().attr('co_id');
+        updateCityMarketShop(coId, type);
     }
 
-    function closeCityMarketShop(){
+    $scope.closeCityMarketShop = function(){
         $scope.market.shop.isActive = false;
         $scope.$apply;
     }
 
-    function updateCityMarketShop(commodityId){
-        if(!$scope.market.shop.isActive) return;
+    function updateCityMarketShop(commodityId, type){
 
         if(commodityId) $scope.market.shop.commodityId = commodityId;
-        var commodity = game_data.COMMODITIES.get($scope.market.shop.commodityId);
+        if(type) $scope.market.shop.type = type;
+        var commodity = $scope.market.commodities.get(commodityId);
+        $scope.market.shop.commoditySelector = commodity;
 
-        $scope.market.shop.buySelected = false;
-        $scope.market.shop.sellSelected = false;
-        $scope.market.shop.amountAvailable = 0;
-        $scope.market.shop.commodityPrice = 0;
-        $scope.market.shop.commodityWeight = 0;
-        $scope.market.shop.priceSum = 0;
-        $scope.market.shop.weightSum = 0;
+        if($scope.market.shop.type=='buy'){
+            $scope.market.shop.buySelected = true;
+            $scope.market.shop.sellSelected = false;
+            var amountReply = $scope.city.getCommodity(commodity);
+            var priceReply = $scope.city.getCommoditySalePrice(commodity);
+        } else {
+            $scope.market.shop.buySelected = false;
+            $scope.market.shop.sellSelected = true;
+            var amountReply = $scope.aircraft.getCargo(commodity);
+            var priceReply = $scope.city.getCommodityBuyPrice(commodity);
+        }
+        if(amountReply.success && priceReply.success){
+            $scope.market.shop.amountAvailable = amountReply.message.amount;
+            var commodityPrice = priceReply.message;
+        } else {
+            $scope.market.shop.amountAvailable = 0;
+            var commodityPrice = 0;
+        }
+        $scope.market.shop.commodityWeight = commodity.weight;
+        $scope.market.shop.commodityPrice = getMoney(commodityPrice, true);
+        $scope.market.shop.priceSum = getMoney(commodityPrice * $scope.market.shop.amount, true);
+        $scope.market.shop.weightSum = $scope.market.shop.commodityWeight * $scope.market.shop.amount;
 
         $scope.$apply;
     }
 
     $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);
     $(document).on('longScreenUpdate', function(){
-        updateCityMarket();
-        updateCityMarketShop();
+        if($scope.market.isActive) updateCityMarket();
+        if($scope.market.shop.isActive) updateCityMarketShop();
     });
 });
 

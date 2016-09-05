@@ -6905,7 +6905,7 @@ function getDB(){
             var price = getCommodityPrice(amount, required, co.base_price);
 
             // add this commodity to the market of this city
-            CITIES.get(c.id).market.set({ id: co.id, name: co.name, amount: amount, required: required, price: price, base_price: co.base_price });
+            CITIES.get(c.id).market.set({ id: co.id, name: co.name, amount: amount, required: required, price: price, base_price: co.base_price, weight: co.weight });
         });
 
         // set production values

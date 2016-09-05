@@ -208,6 +208,26 @@ function City(id, name, state_id, country_id, population, position) {
         var price = getMoney(this.market.get(commodity.id).price * 1.1);
         return { success: true, message: price };
     }
+    this.getCommodity = function(commodity, amount){
+        if(!commodity) return {success: false, message: 'City.getCommodity(): commodity is required'};
+
+        var marketCommodity = this.market.get(commodity.id);
+
+        // do we even have that commodity?
+        if(!marketCommodity) return { success: false, message: 'Market does not have this commodity' };
+        if(marketCommodity.amount <= 0){
+            return { success: false, message: 'City does not have enough in stock' };
+        }
+
+        // if the amount wasn't asked for
+        if(!amount) return { success: true, message: marketCommodity };
+
+
+        // do we have enough of the commodity?
+        if(marketCommodity.amount < amount) return { success: false, message: 'City does not have enough in stock' };
+
+        return { success: true, message: marketCommodity };
+    }
 }
 
 

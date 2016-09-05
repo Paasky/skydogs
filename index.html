@@ -66,7 +66,7 @@
                             <div id="cityScreen-name">{{city.name}}</div>
                             <div id="cityScreen-pop">Pop. {{city.population.city}}</div>
                             <div id="cityScreen-content" class="scrollable">
-                                <div id="cityMarket" class="cityScreen-contentItem" ng-hide="!market.isActive">
+                                <div id="cityMarket" class="cityScreen-contentItem" ng-if="market.isActive">
                                     <h1>Market</h1>
                                     <table id="cityScreenMarket" class="tablesorter">
                                         <thead>
@@ -88,15 +88,16 @@
                                             <tr ng-repeat="co in city.market.getAll()" co_id="{{co.id}}">
                                                 <td>{{co.name}}</td>
                                                 <td class="borderRight">{{getMoney(co.base_price, true)}}</td>
-                                                <td
-                                                    style="{{getMarketCommoditySellCss(co)}}"
+                                                <td style="{{getMarketCommoditySellCss(co)}}"
                                                     ng-disabled="getMarketSellDisabled(co)"
-                                                    ng-click="openCityMarketShop($event, 'sell')"
-                                                >{{getMoney(co.getBuyPrice().message, true)}}</td>
+                                                    ng-click="openCityMarketShop($event, 'sell')">
+                                                    {{getMoney(co.getBuyPrice().message, true)}}
+                                                </td>
                                                 <td style="{{getMarketBuyCss(co)}}"
                                                     ng-disabled="getMarketBuyDisabled(co)"
-                                                    ng-click="openCityMarketShop($event, 'buy')"
-                                                >{{getMoney(co.getSalePrice().message, true)}}</td>
+                                                    ng-click="openCityMarketShop($event, 'buy')">
+                                                    {{getMoney(co.getSalePrice().message, true)}}
+                                                </td>
                                                 <td class="borderRight">{{co.amount}}</td>
                                                 <td>{{getMoney(aircraft.getCargo(co).message.valuePerItem)}}</td>
                                                 <td>{{aircraft.getCargo(co).message.amount}}</td>
@@ -104,13 +105,15 @@
                                         </tbody>
                                     </table>
                                 </div>
-                                <div id="cityMarketShop" class="window center-xy" ng-hide="!market.shop.isActive">
+                                <div id="cityMarketShop" class="window center-xy" ng-if="market.shop.isActive">
                                     <div class="windowHeader">
                                         <select id="shopTypeSelector" ng-model="market.shop.typeSelector">
                                             <option ng-selected="market.shop.buySelected" value="buy">Buy</option>
                                             <option ng-selected="market.shop.sellSelected" value="sell">Sell</option>
                                         </select>
-                                        <select id="shopCommoditySelector" ng-model="market.shop.commoditySelector" ng-options="co.name for co in market.commodities.getAll() track by co.id">
+                                        <select id="shopCommoditySelector"
+                                                ng-model="market.shop.commoditySelector"
+                                                ng-options="co.name for co in city.market.getAll() track by co.id">
                                         </select>
                                         <span class="windowClose" ng-click="closeCityMarketShop()">x</span>
                                     </div>
@@ -119,20 +122,27 @@
                                             <tr>
                                                 <td>Amount:</td>
                                                 <td><input ng-model="market.shop.amount" type=number id="shopAmount" value="1" min="1"></td>
-                                                <td class="gray"> {{market.shop.amountAvailable}} available</td>
+                                                <td id="shopAmountAvailable" class="gray"> {{getShopAmountAvailable()}} available</td>
                                             </tr>
                                             <tr>
                                                 <td>Unit Price:</td>
-                                                <td>{{getMoney(market.shop.commodityPrice, true)}}</td>
+                                                <td>{{getMoney(getShopCommodityPrice(), true)}}</td>
                                             </tr>
                                             <tr>
                                                 <td>Unit Weight:</td>
-                                                <td>{{market.shop.commodityWeight}} kg</td>
+                                                <td>{{market.shop.commoditySelector.weight}} kg</td>
                                             </tr>
                                             <tr class="sum-row">
                                                 <td>Total Sum:</td>
-                                                <td>{{getMoney(market.shop.priceSum, true)}}</td>
-                                                <td rowspan="4"><span id="shopConfirm" class="windowButton" ng-click="confirmCityMarketShop">{{market.shop.typeSelector}}</span></td>
+                                                <td>{{getMoney(getShopCommodityPrice()*market.shop.amount, true)}}</td>
+                                                <td rowspan="4">
+                                                    <span id="shopConfirm"
+                                                          class="windowButton"
+                                                          ng-click="confirmCityMarketShop()"
+                                                          ng-disabled="getShopConfirmDisabled()">
+                                                        {{market.shop.typeSelector}}
+                                                    </span>
+                                                </td>
                                             </tr>
                                             <tr class="gray">
                                                 <td>Your money:</td>
@@ -140,7 +150,7 @@
                                             </tr>
                                             <tr>
                                                 <td>Total Weight:</td>
-                                                <td>{{market.shop.weightSum}} kg</td>
+                                                <td>{{market.shop.commoditySelector.weight*market.shop.amount}} kg</td>
                                             </tr>
                                             <tr class="gray">
                                                 <td>Free space:</td>

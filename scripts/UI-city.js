@@ -54,7 +54,7 @@ app.controller('CityUIController', function UIController($scope) {
 
     $scope.openCityMarket = function(){
         $scope.market.isActive = true;
-        updateCityMarket();
+        $scope.$apply;
     }
 
     function closeCityMarket(){
@@ -94,136 +94,66 @@ app.controller('CityUIController', function UIController($scope) {
         return true;
     }
 
-    function updateCityMarket(){
-        return;
-
-        $scope.market.commodities = new ObjectHolder();
-
-        $scope.city.market.forEach(function(co){
-
-            var scopeCommodity = {
-                id: co.id,
-                name: co.name,
-                basePrice: co.base_price,
-                weight: co.weight,
-                buyCss: '',
-                sellCss: '',
-                buyDisabled: false,
-                sellDisabled: false,
-                buySelected: false,
-                sellSelected: false,
-            };
-
-            // set up data
-            var dataCityAmount = co.amount;
-            var dataCityModifier = co.modifier;
-            var dataCityBuyPrice = $scope.city.getCommodityBuyPrice(co).message;
-            var dataCitySalePrice = $scope.city.getCommoditySalePrice(co).message;
-            var buyCss = '';
-            var sellCss = '';
-
-            // does the city have this commodity -> can buy?
-            if(dataCityAmount != 0){
-                var canBuy = true;
-
-                if(dataCityModifier > 1){
-                    buyCss = 'color: rgb('+Math.round((dataCityModifier-1)*128)+',0,0)';
-                } else {
-                    buyCss = 'color: rgb(0,'+Math.round((dataCityModifier-1)*-256)+',0)';
-                }
-            } else {
-                var canBuy = false;
-            }
-
-            // does the aircraft have this commodity -> can sell?
-            if($scope.aircraft.getCargo(co).success){
-                var canSell = true;
-                var dataPlayerValue = $scope.aircraft.getCargo(co).message.valuePerItem;
-
-                if(dataCityModifier > 1){
-                    sellCss = 'color: rgb(0,'+Math.round((dataCityModifier-1)*128)+',0)';
-                } else {
-                    sellCss = 'color: rgb('+Math.round((dataCityModifier-1)*-256)+',0,0)';
-                }
-            } else {
-                var canSell = false;
-            }
-
-            // add data to to scopeCommodity
-            scopeCommodity.buyPrice = dataCityBuyPrice;
-            scopeCommodity.salePrice = dataCitySalePrice;
-
-            if(canSell){
-                scopeCommodity.playerValue = dataPlayerValue;
-                scopeCommodity.playerAmount = $scope.aircraft.getCargo(co).message.amount;
-                scopeCommodity.sellCss = sellCss;
-            } else {
-                scopeCommodity.playerValue = 0;
-                scopeCommodity.playerAmount = 0;
-                scopeCommodity.sellDisabled = true;
-            }
-
-            if(canBuy){
-                scopeCommodity.cityAmount = dataCityAmount;
-                scopeCommodity.buyCss = buyCss;
-            } else {
-                scopeCommodity.cityAmount = 0;
-                scopeCommodity.buyDisabled = true;
-            }
-
-            // push it to the market
-            $scope.market.commodities.set(scopeCommodity);
-
-        // end city market foreach
-        });
-
-        $scope.$apply;
-
-    // end updateCityMarket
-    }
-
 
     ///// CITY MARKET SHOP /////
 
     $scope.openCityMarketShop = function($event, type){
+        if(angular.element($event.currentTarget).attr('disabled')) return;
         $scope.market.shop.isActive = true;
-        var coId = angular.element($event.currentTarget).parent().attr('co_id');
-        updateCityMarketShop(coId, type);
+        var commodityId = angular.element($event.currentTarget).parent().attr('co_id');
+        if(commodityId)
+            $scope.market.shop.commoditySelector = $scope.city.market.get(commodityId);
+        if(type) $scope.market.shop.typeSelector = type;
+        $scope.$apply;
     }
 
     $scope.closeCityMarketShop = function(){
         $scope.market.shop.isActive = false;
         $scope.$apply;
     }
-
-    function updateCityMarketShop(commodityId, type){
-
-        if(commodityId)
-            $scope.market.shop.commoditySelector = $scope.market.commodities.get(commodityId);
-        if(type) $scope.market.shop.typeSelector = type;
-        var co = $scope.market.shop.commoditySelector;
+    $scope.confirmCityMarketShop = function($event){
 
         if($scope.market.shop.typeSelector=='buy'){
-            $scope.market.shop.buySelected = true;
-            $scope.market.shop.sellSelected = false;
-            $scope.market.shop.commodityPrice = co.salePrice;
+            if( $scope.player.money < $scope.getShopCommodityPrice() * $scope.market.shop.amount )
+                NotificationFactory.create('Not enough money', 'exclamation');
+            if( $scope.aircraft.getFreeCargoSpace() < $scope.market.shop.commoditySelector.weight * $scope.market.shop.amount )
+                NotificationFactory.create('Not enough space in cargo hold', 'exclamation');
+            if( $scope.market.shop.commoditySelector.amount < $scope.market.shop.amount )
+                NotificationFactory.create('City does not have enough', 'exclamation');
         } else {
-            $scope.market.shop.buySelected = false;
-            $scope.market.shop.sellSelected = true;
-            $scope.market.shop.commodityPrice = co.buyPrice;
+            if( $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount < $scope.market.shop.amount)
+                NotificationFactory.create('Cargo hold does not have enough', 'exclamation');
         }
-        $scope.market.shop.commodityWeight = co.weight;
-        $scope.market.shop.priceSum = getMoney($scope.market.shop.commodityPrice * $scope.market.shop.amount);
-        $scope.market.shop.weightSum = getMoney($scope.market.shop.commodityWeight * $scope.market.shop.amount);
+    }
 
-        //$scope.$apply;
+    $scope.getShopAmountAvailable = function(){
+        if($scope.market.shop.typeSelector=='buy')
+            return $scope.market.shop.commoditySelector.amount;
+        return $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount;
+    }
+    $scope.getShopCommodityPrice = function(){
+        if($scope.market.shop.typeSelector=='buy')
+            return $scope.market.shop.commoditySelector.getSalePrice().message;
+        return $scope.market.shop.commoditySelector.getBuyPrice().message;
+    }
+    $scope.getShopConfirmDisabled = function(){
+        if($scope.market.shop.typeSelector=='buy'){
+            if( $scope.player.money < $scope.getShopCommodityPrice() * $scope.market.shop.amount
+                ||
+                $scope.aircraft.getFreeCargoSpace() < $scope.market.shop.commoditySelector.weight * $scope.market.shop.amount
+                ||
+                $scope.market.shop.commoditySelector.amount < $scope.market.shop.amount
+              ) return true;
+            return false;
+        } else {
+            if( $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount < $scope.market.shop.amount)
+                return true;
+            return false;
+        }
     }
 
     $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);
-    $(document).on('longScreenUpdate', function(){
-        if($scope.market.isActive) updateCityMarket();
-        if($scope.market.shop.isActive) updateCityMarketShop();
-    });
+    $(document).on('longScreenUpdate', function(){ $scope.$apply; });
 });
 
 

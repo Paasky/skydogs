@@ -19,6 +19,7 @@ table{ border-spacing: 0; }
     table.tablesorter thead tr:nth-child(2) .headerSortDown {
         background-image: url(lib/desc.gif);
     }
+        /* legacy */
         td[action] {
             text-decoration: underline;
             cursor: pointer;
@@ -555,6 +556,10 @@ select, input, textarea {
             width: 100%;
             text-align: center;
         }
+            #cityScreenMarket td[ng-click]:not([disabled]) {
+                text-decoration: underline;
+                cursor: pointer;
+            }
         #shopContent {
             width: 100%;
         }

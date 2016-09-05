@@ -6904,8 +6904,24 @@ function getDB(){
             // set the market price
             var price = getCommodityPrice(amount, required, co.base_price);
 
+            var marketCommodity = cloneObject(co);
+            marketCommodity.amount = amount;
+            marketCommodity.required = required;
+            marketCommodity.price = price;
+            marketCommodity.getBuyPrice = function(amount){
+                var price = getMoney(this.price * 0.9);
+                return { success: true, message: price };
+            }
+            marketCommodity.getSalePrice = function(amount){
+                if(amount && this.amount < amount){
+                    return { success: false, message: 'City does not have enough in stock' };
+                }
+                var price = getMoney(this.price * 1.1);
+                return { success: true, message: price };
+            }
+
             // add this commodity to the market of this city
-            CITIES.get(c.id).market.set({ id: co.id, name: co.name, amount: amount, required: required, price: price, base_price: co.base_price, weight: co.weight });
+            CITIES.get(c.id).market.set(marketCommodity);
         });
 
         // set production values

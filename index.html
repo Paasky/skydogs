@@ -85,14 +85,21 @@
                                             </tr>
                                         </thead>
                                         <tbody>
-                                            <tr ng-repeat="co in market.commodities.getAll()" co_id="{{co.id}}">
+                                            <tr ng-repeat="co in city.market.getAll()" co_id="{{co.id}}">
                                                 <td>{{co.name}}</td>
-                                                <td class="borderRight">{{co.basePrice}}</td>
-                                                <td style="{{co.sellCss}}" ng-disabled="co.sellDisabled" ng-click="openCityMarketShop($event, 'sell')">{{co.buyPrice}}</td>
-                                                <td style="{{co.buyCss}}"  ng-disabled="co.buyDisabled"  ng-click="openCityMarketShop($event, 'buy')">{{co.salePrice}}</td>
-                                                <td class="borderRight">{{co.cityAmount}}</td>
-                                                <td>{{co.playerValue}}</td>
-                                                <td>{{co.playerAmount}}</td>
+                                                <td class="borderRight">{{getMoney(co.base_price, true)}}</td>
+                                                <td
+                                                    style="{{getMarketCommoditySellCss(co)}}"
+                                                    ng-disabled="getMarketSellDisabled(co)"
+                                                    ng-click="openCityMarketShop($event, 'sell')"
+                                                >{{getMoney(co.getBuyPrice().message, true)}}</td>
+                                                <td style="{{getMarketBuyCss(co)}}"
+                                                    ng-disabled="getMarketBuyDisabled(co)"
+                                                    ng-click="openCityMarketShop($event, 'buy')"
+                                                >{{getMoney(co.getSalePrice().message, true)}}</td>
+                                                <td class="borderRight">{{co.amount}}</td>
+                                                <td>{{getMoney(aircraft.getCargo(co).message.valuePerItem)}}</td>
+                                                <td>{{aircraft.getCargo(co).message.amount}}</td>
                                             </tr>
                                         </tbody>
                                     </table>

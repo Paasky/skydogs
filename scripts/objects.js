@@ -130,10 +130,10 @@ function Aircraft(id, name, fuel, speed, position, destination, player_id, serve
         var cargoHoldCommodity = this.cargoHold.get(commodity.id);
 
         // do we even have that commodity?
-        if(!cargoHoldCommodity) return { success: false, message: 'Cargo Hold does not have this commodity' };
+        if(!cargoHoldCommodity) return { success: false, message: {amount: 0, valuePerItem: 0} };
         if(cargoHoldCommodity.amount <= 0){
             this.cargoHold.deleteById(commodity.id);
-            return { success: false, message: 'Cargo Hold does not have this commodity' };
+            return { success: false, message: {amount: 0, valuePerItem: 0} };
         }
 
         // if the amount wasn't asked for
@@ -196,17 +196,12 @@ function City(id, name, state_id, country_id, population, position) {
     this.getCommodityBuyPrice = function(commodity, amount){
         if(!commodity) return {success: false, message: 'City.getCommodityBuyPrice(): commodity is required'};
         
-        var price = this.market.get(commodity.id).price * 0.9;
-        return { success: true, message: price };
+        return this.market.get(commodity.id).getBuyPrice(amount);
     }
     this.getCommoditySalePrice = function(commodity, amount){
         if(!commodity) return {success: false, message: 'City.getCommoditySalePrice(): commodity is required'};
         
-        if(amount && this.market.get(commodity.id).amount < amount){
-            return { success: false, message: 'City does not have enough in stock' };
-        }
-        var price = getMoney(this.market.get(commodity.id).price * 1.1);
-        return { success: true, message: price };
+        return this.market.get(commodity.id).getSalePrice(amount);
     }
     this.getCommodity = function(commodity, amount){
         if(!commodity) return {success: false, message: 'City.getCommodity(): commodity is required'};

@@ -63,7 +63,39 @@ app.controller('CityUIController', function UIController($scope) {
         $scope.$apply;
     }
 
+    $scope.getMarketBuyCss = function(co){
+        var css = '';
+        if(co.amount > 0){
+            if(co.modifier > 1){
+                css = 'color: rgb('+Math.round((co.modifier-1)*128)+',0,0)';
+            } else {
+                css = 'color: rgb(0,'+Math.round((co.modifier-1)*-256)+',0)';
+            }
+        }
+        return css;
+    }
+    $scope.getMarketSellCss = function(co){
+        var css = '';
+        if($scope.aircraft.getCargo(co).success){
+            if(co.modifier > 1){
+                css = 'color: rgb('+Math.round((co.modifier-1)*128)+',0,0)';
+            } else {
+                css = 'color: rgb(0,'+Math.round((co.modifier-1)*-256)+',0)';
+            }
+        }
+        return css;
+    }
+    $scope.getMarketBuyDisabled = function(co){
+        if(co.amount>0) return false;
+        return true;
+    }
+    $scope.getMarketSellDisabled = function(co){
+        if($scope.aircraft.getCargo(co).success) return false;
+        return true;
+    }
+
     function updateCityMarket(){
+        return;
 
         $scope.market.commodities = new ObjectHolder();
 

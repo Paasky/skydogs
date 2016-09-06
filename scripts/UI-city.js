@@ -114,15 +114,32 @@ app.controller('CityUIController', function UIController($scope) {
     $scope.confirmCityMarketShop = function($event){
 
         if($scope.market.shop.typeSelector=='buy'){
-            if( $scope.player.money < $scope.getShopCommodityPrice() * $scope.market.shop.amount )
+            if( $scope.player.money < $scope.getShopCommodityPrice() * $scope.market.shop.amount ){
                 NotificationFactory.create('Not enough money', 'exclamation');
-            if( $scope.aircraft.getFreeCargoSpace() < $scope.market.shop.commoditySelector.weight * $scope.market.shop.amount )
+                return false;
+            }
+            if( $scope.aircraft.getFreeCargoSpace() < $scope.market.shop.commoditySelector.weight * $scope.market.shop.amount ){
                 NotificationFactory.create('Not enough space in cargo hold', 'exclamation');
-            if( $scope.market.shop.commoditySelector.amount < $scope.market.shop.amount )
+                return false;
+            }
+            if( $scope.market.shop.commoditySelector.amount < $scope.market.shop.amount ){
                 NotificationFactory.create('City does not have enough', 'exclamation');
+                return false;
+            }
+
+            var buyReply = userBuyCommodity($scope.market.shop.commoditySelector.id, $scope.market.shop.amount);
+            if(!buyReply.success){ var type='exclamation'; }
+            NotificationFactory.create(buyReply.message, type);
+
         } else {
-            if( $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount < $scope.market.shop.amount)
+            if( $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount < $scope.market.shop.amount){
                 NotificationFactory.create('Cargo hold does not have enough', 'exclamation');
+                return false;
+            }
+
+            var sellReply = userSellCommodity($scope.market.shop.commoditySelector.id, $scope.market.shop.amount);
+            if(!sellReply.success){ var type='exclamation'; }
+            NotificationFactory.create(sellReply.message, type);
         }
     }
 
@@ -165,13 +182,17 @@ $('#cityScreen-sellAllBtn').click(function(e){
     var a = game_data.AIRCRAFTS.get(game_data.player_settings.id);
     if(!a.cargoHold.ids.length) WindowFactory.createInfo(JSON.stringify({success: false, message: 'Cargo Hold is empty'}));
     a.cargoHold.forEach(function(co){
-        WindowFactory.createInfo(JSON.stringify(userSellCommodity(co.id, co.amount).message));
+        var sellReply = userSellCommodity(co.id, co.amount);
+        if(!sellReply.success){ var type='exclamation'; }
+        NotificationFactory.create(sellReply.message, type);
     });
 });
 
 // Refuels the plane
 $('#cityScreen-refuelBtn').click(function(e){
     e.stopPropagation();
-    WindowFactory.createInfo(JSON.stringify(userRefuel().message));
+    var refuelReply = userRefuel();
+    if(!refuelReply.success){ var type='exclamation'; }
+    NotificationFactory.create(refuelReply.message, type);
 });
 $('#cityScreen-leaveBtn').click(function(){ $(document).trigger('cityLeave', game_data.PLAYERS.get(game_data.player_settings.id).getAircraft().id); });

@@ -445,7 +445,7 @@ function userSetDestination(type, id){
 function buyCommodity(aircraft, commodity, amount){
 
     // check variables
-    if(!aircraft || !commodity || !amount) return {success: false, message: 'aircraft, commodity and amount are required'};
+    if(!aircraft || !commodity || !amount) return {success: false, message: 'buyCommodity: aircraft, commodity and amount are required'};
 
     // get required variables
     var city = CITIES.get(aircraft.position.id);
@@ -480,7 +480,7 @@ function buyCommodity(aircraft, commodity, amount){
         tick: tickCounter,
     });
 
-    return {success: true, message: { price: sum }};
+    return {success: true, message: 'Purchase successful'};
 }
 function userBuyCommodity(commodity_id, amount){
     var commodity = COMMODITIES.get(commodity_id);
@@ -491,7 +491,7 @@ function userBuyCommodity(commodity_id, amount){
 function sellCommodity(aircraft, commodity, amount){
 
     // check variables
-    if(!aircraft || !commodity || !amount) return {success: false, message: 'aircraft, commodity and amount are required'};
+    if(!aircraft || !commodity || !amount) return {success: false, message: 'sellCommodity: aircraft, commodity and amount are required'};
 
     // get required variables
     var city = CITIES.get(aircraft.position.id);
@@ -509,7 +509,7 @@ function sellCommodity(aircraft, commodity, amount){
 
     // try to take it from the aircraft
     var cargoStatus = aircraft.takeCargo(commodity, amount);
-    if(!cargoStatus.success) return cargoStatus;
+    if(!cargoStatus.success) return {success: false, message: 'Could not remove cargo from aircraft'};
 
     // add it to the city
     city.market.get(commodity.id).amount += amount;
@@ -518,11 +518,13 @@ function sellCommodity(aircraft, commodity, amount){
     // all done, add the money & return
     player.money = getMoney(player.money + price);
 
+    /*
     var message = { price: price };
     if(origValue){
         message.origValue = origValue;
         message.profit = getMoney(price-origValue);
     }
+    */
 
     CITYBUYHISTORY.push({
         commodity: commodity.id,
@@ -535,7 +537,7 @@ function sellCommodity(aircraft, commodity, amount){
         tick: tickCounter,
     });
 
-    return {success: true, message: message };
+    return {success: true, message: 'Sale successful' };
 }
 function userSellCommodity(commodity_id, amount){
     var commodity = COMMODITIES.get(commodity_id);

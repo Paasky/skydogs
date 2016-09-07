@@ -166,21 +166,21 @@
                                                 <td rowspan="4">
                                                     <span id="shopConfirm"
                                                           class="windowButton"
-                                                          ng-click="confirmCityMarketShop()"
+                                                          ng-click="confirmCityMarketShop($event)"
                                                           ng-disabled="getShopConfirmDisabled()">
                                                         {{market.shop.typeSelector}}
                                                     </span>
                                                 </td>
                                             </tr>
-                                            <tr class="gray">
+                                            <tr class="gray" ng-if="market.shop.typeSelector=='buy'">
                                                 <td>Your money:</td>
                                                 <td>{{getMoney(player.money, true)}}</td>
                                             </tr>
-                                            <tr>
+                                            <tr ng-if="market.shop.typeSelector=='buy'">
                                                 <td>Total Weight:</td>
                                                 <td>{{market.shop.commoditySelector.weight*market.shop.amount}} kg</td>
                                             </tr>
-                                            <tr class="gray">
+                                            <tr class="gray" ng-if="market.shop.typeSelector=='buy'">
                                                 <td>Free space:</td>
                                                 <td>{{aircraft.getFreeCargoSpace()}} kg</td>
                                             </tr>

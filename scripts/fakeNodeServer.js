@@ -536,7 +536,8 @@ function sellCommodity(aircraft, commodity, amount){
         city: city.id,
         tick: tickCounter,
     });
-
+    if(origValue)
+        return {success: true, message: 'Sold with a profit of '+getMoney( priceStatus.message*amount-origValue, true) };
     return {success: true, message: 'Sale successful' };
 }
 function userSellCommodity(commodity_id, amount){

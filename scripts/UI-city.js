@@ -194,7 +194,13 @@ $('#cityScreen-sellAllBtn').click(function(e){
 $('#cityScreen-refuelBtn').click(function(e){
     e.stopPropagation();
     var refuelReply = userRefuel();
-    if(!refuelReply.success){ var type='exclamation'; }
-    NotificationFactory.create(refuelReply.message, type);
+    if(refuelReply.success){
+        var message = 'Refueled '+getMoney(refuelReply.message.amount)+'L for '+getMoney(refuelReply.message.price, true);
+    }
+    else {
+        var type='exclamation';
+        var message = refuelReply.message;
+    }
+    NotificationFactory.create(message, type);
 });
 $('#cityScreen-leaveBtn').click(function(){ $(document).trigger('cityLeave', game_data.PLAYERS.get(game_data.player_settings.id).getAircraft().id); });

@@ -14,6 +14,7 @@ app.controller('CityUIController', function UIController($scope) {
         commodities: [],
         shop: {
             isActive: false,
+            windowInited: false,
             buySelected: false,
             sellSelected: false,
             amountAvailable: 0,
@@ -112,12 +113,16 @@ app.controller('CityUIController', function UIController($scope) {
         $scope.market.shop.isActive = true;
         $scope.$apply;
 
-        setTimeout(function(){
-            WindowFactory.initWindow($('#cityMarketShop'));
-        }, 10);
+        if(!$scope.market.shop.windowInited){
+            setTimeout(function(){
+                WindowFactory.initWindow($('#cityMarketShop'));
+            }, 10);
+            $scope.market.shop.windowInited = true;
+        }
     }
     $scope.closeCityMarketShop = function(){
         $scope.market.shop.isActive = false;
+        $scope.market.shop.windowInited = false;
         $scope.$apply;
     }
 

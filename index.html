@@ -20,8 +20,36 @@
                         </div>
                     </div>
                     <div id="map-tab" class="ui-item-tr view-tab ui-btn active">Map</div>
-                    <div id="market-tab" class="ui-item-tr view-tab ui-btn">Market</div>
+                    <div ng-click="openWorldMarket()" id="market-tab" class="ui-item-tr view-tab ui-btn">Market</div>
                     <div id="profile-tab" class="ui-item-tr view-tab ui-btn">Profile</div>
+                    <div id="world-market-window" class="window center-xy" ng-if="wm.isActive">
+                        <div class="windowHeader">
+                            World Market <span id="worldMarketFilterBtn" class="windowButton" ng-click="openWorldMarketFilter()">Filter</span>
+                            <span class="windowClose" ng-click="closeWorldMarket()">x</span>
+                        </div>
+                        <div class="windowContent scrollable">
+                            <table id="world-market" class="tablesorter">
+                                <thead>
+                                    <tr>
+                                        <th>Name</th>
+                                        <th>Price</th>
+                                        <th>% of Avg</th>
+                                        <th>Distance</th>
+                                        <th>City</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <tr ng-repeat="row in wm.marketRows">
+                                        <td>row.name</td>
+                                        <td>row.price</td>
+                                        <td>row.avgPercent</td>
+                                        <td>row.cityDistance</td>
+                                        <td ng-click="flyToCity($event)" cityId="row.cityId">row.cityName</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
                 </div>
                 <div ng-controller="InfoUIController" id="bottom-menu" class="ui-elem ui-item-br">
                     <i id="speed-btn" class="fa fa-tachometer ui-btn" aria-hidden="true">260 km/h</i>

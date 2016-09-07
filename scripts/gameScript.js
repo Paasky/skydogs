@@ -8,8 +8,7 @@ $(document).mousemove(function(event) {
 
 
 // fly to a city
-function flyToCityId(){
-    var cityId = $(this).attr('flyToCityId');
+function flyToCityId(cityId){
     var setReply = userSetDestination('city', cityId);
     if(!setReply.success){ var type='exclamation'; }
     NotificationFactory.create(setReply.message, type);

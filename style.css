@@ -413,6 +413,9 @@ select, input, textarea {
           padding: 0 0.5em;
           margin: 0.25em;
         }
+            .windowHeader option {
+              color: #333;
+            }
         .windowClose {
             display: inline-block;
             float: right;

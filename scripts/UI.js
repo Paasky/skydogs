@@ -79,9 +79,6 @@ var WindowFactory = {
             var newWindow = $('#'+data.id).html(html);
         }
         
-        newWindow.mousedown(function(){
-            WindowFactory.setActive(newWindow);
-        });
         newWindow.find('[action="confirm"]').click(function(){
             if(data.callback) var callbackReply = data.callback(true);
             if(!data.callback || !callbackReply) newWindow.remove();
@@ -91,9 +88,13 @@ var WindowFactory = {
             if(!data.callback || !callbackReply) newWindow.remove();
         });
         
-        if(createNewWindow) $('#app-container').append(newWindow);
-        WindowFactory.setActive(newWindow);
-        WindowFactory.setDraggable(newWindow);
+        if(createNewWindow){
+            $('#app-container').append(newWindow);
+            WindowFactory.initWindow(newWindow);
+        } else {
+            WindowFactory.setActive(newWindow);
+        }
+        return newWindow;
     },
     createConfirm: function(content, returnString){
         return WindowFactory.create({type: 'confirm', content: content}, returnString);
@@ -104,6 +105,13 @@ var WindowFactory = {
     createWarn: function(content, returnString){
         return WindowFactory.create({type: 'warn', content: content}, returnString);
     },
+    initWindow: function(elem){
+        elem.mousedown(function(){
+            WindowFactory.setActive(elem);
+        });
+        WindowFactory.setActive(elem);
+        WindowFactory.setDraggable(elem);
+    },
     setActive: function(elem){
         $('.window').removeClass('active');
         elem.addClass('active');
@@ -113,16 +121,17 @@ var WindowFactory = {
             y_pos = 0;
 
         function mouseUp() {
-            elem.unbind('mousemove', divMove, true);
+            $(document).unbind('mousemove', divMove, true);
         }
 
         function mouseDown(e) {
-            x_pos = e.clientX - elem.offset().left;
-            y_pos = e.clientY - elem.offset().top;
-            elem.mousemove(divMove);
+            x_pos = e.clientX - elem.position().left;
+            y_pos = e.clientY - elem.position().top;
+            $(document).mousemove(divMove);
         }
 
         function divMove(e) {
+            window.getSelection().removeAllRanges();
             elem.css('transform', 'none');
             if(e.clientY >= 0 && e.clientY <= $(window).height()){
                 elem.css('top', (e.clientY - y_pos) + 'px');
@@ -132,8 +141,8 @@ var WindowFactory = {
             }
         }
 
-        elem.mousedown(mouseDown);
-        elem.mouseup(mouseUp);
+        elem.find('.windowHeader').mousedown(mouseDown);
+        elem.find('.windowHeader').mouseup(mouseUp);
     }
 }
 
@@ -158,6 +167,8 @@ var NotificationFactory = {
                 function(){ $(this).remove(); }
             );
         }, duration);
+
+        return newNotification;
     },
 }
 

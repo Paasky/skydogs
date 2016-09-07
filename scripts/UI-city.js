@@ -56,13 +56,13 @@ app.controller('CityUIController', function UIController($scope) {
         $scope.market.isActive = true;
         $scope.$apply;
     }
-
-    function closeCityMarket(){
+    $scope.closeCityMarket = function(){
         $scope.market.isActive = false;
         $scope.market.shop.isActive = false;
         $scope.$apply;
     }
 
+    // css getters
     $scope.getMarketBuyCss = function(co){
         var css = '';
         if(co.amount > 0){
@@ -85,6 +85,8 @@ app.controller('CityUIController', function UIController($scope) {
         }
         return css;
     }
+
+    // buy/sell disabled getters
     $scope.getMarketBuyDisabled = function(co){
         if(co.amount>0) return false;
         return true;
@@ -99,43 +101,37 @@ app.controller('CityUIController', function UIController($scope) {
 
     $scope.openCityMarketShop = function($event, type){
         if(angular.element($event.currentTarget).attr('disabled')) return;
-        $scope.market.shop.isActive = true;
+
+        // commodity id is found in the tr-element (clicks come from td elements)
         var commodityId = angular.element($event.currentTarget).parent().attr('co_id');
         if(commodityId)
             $scope.market.shop.commoditySelector = $scope.city.market.get(commodityId);
         if(type) $scope.market.shop.typeSelector = type;
-        $scope.$apply;
-    }
 
+        // activate the market shop
+        $scope.market.shop.isActive = true;
+        $scope.$apply;
+
+        setTimeout(function(){
+            WindowFactory.initWindow($('#cityMarketShop'));
+        }, 10);
+    }
     $scope.closeCityMarketShop = function(){
         $scope.market.shop.isActive = false;
         $scope.$apply;
     }
+
+    // confirm the purchase/sale
     $scope.confirmCityMarketShop = function($event){
+        if(angular.element($event.currentTarget).attr('disabled')) return;
 
         if($scope.market.shop.typeSelector=='buy'){
-            if( $scope.player.money < $scope.getShopCommodityPrice() * $scope.market.shop.amount ){
-                NotificationFactory.create('Not enough money', 'exclamation');
-                return false;
-            }
-            if( $scope.aircraft.getFreeCargoSpace() < $scope.market.shop.commoditySelector.weight * $scope.market.shop.amount ){
-                NotificationFactory.create('Not enough space in cargo hold', 'exclamation');
-                return false;
-            }
-            if( $scope.market.shop.commoditySelector.amount < $scope.market.shop.amount ){
-                NotificationFactory.create('City does not have enough', 'exclamation');
-                return false;
-            }
 
             var buyReply = userBuyCommodity($scope.market.shop.commoditySelector.id, $scope.market.shop.amount);
             if(!buyReply.success){ var type='exclamation'; }
             NotificationFactory.create(buyReply.message, type);
 
         } else {
-            if( $scope.aircraft.getCargo($scope.market.shop.commoditySelector).message.amount < $scope.market.shop.amount){
-                NotificationFactory.create('Cargo hold does not have enough', 'exclamation');
-                return false;
-            }
 
             var sellReply = userSellCommodity($scope.market.shop.commoditySelector.id, $scope.market.shop.amount);
             if(!sellReply.success){ var type='exclamation'; }
@@ -143,6 +139,7 @@ app.controller('CityUIController', function UIController($scope) {
         }
     }
 
+    // shop data getters
     $scope.getShopAmountAvailable = function(){
         if($scope.market.shop.typeSelector=='buy')
             return $scope.market.shop.commoditySelector.amount;
@@ -169,7 +166,7 @@ app.controller('CityUIController', function UIController($scope) {
         }
     }
 
-    $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(closeCityMarket);
+    $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click($scope.closeCityMarket);
     $(document).on('longScreenUpdate', function(){ $scope.$apply; });
 });
 
@@ -180,7 +177,7 @@ app.controller('CityUIController', function UIController($scope) {
 $('#cityScreen-sellAllBtn').click(function(e){
     e.stopPropagation();
     var a = game_data.AIRCRAFTS.get(game_data.player_settings.id);
-    if(!a.cargoHold.ids.length) WindowFactory.createInfo(JSON.stringify({success: false, message: 'Cargo Hold is empty'}));
+    if(!a.cargoHold.ids.length) NotificationFactory.create('Cargo Hold is empty', 'exclamation');
     a.cargoHold.forEach(function(co){
         var sellReply = userSellCommodity(co.id, co.amount);
         if(!sellReply.success){ var type='exclamation'; }

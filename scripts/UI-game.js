@@ -26,48 +26,63 @@ app.controller('MenuUIController', function UIController($scope) {
             avgMax: 200,
             distanceMin: 0,
             distanceMax: 5000,
-            commodities: false,
+            priceMin: 0,
+            priceMax: 20,
+            commodities: [],
         },
-        marketRows: [],
+        marketRows: {},
     };
+    game_data.CITIES.forEach(function(city){
+        city.market.forEach(function(co){
+            $scope.marketRows[city.id+'_'+co.id] = {
+                name: co.name,
+                price: co.price,
+                avgPercent: 100,
+                cityDistance: 0,
+                cityId: city.id,
+                cityName: city.name,
+            };
+        });
+    });
 
     $scope.openWorldMarket = function(){
-        $scope.isActive = true;
+        $scope.wm.isActive = true;
         updateMarketData();
         $scope.$apply;
     }
     $scope.closeWorldMarket = function(){
-        $scope.isActive = false;
+        $scope.wm.isActive = false;
         $scope.$apply;
     }
 
     function updateMarketData(){
 
-        $scope.marketRows = [];
+        $scope.wm.marketRows = [];
 
         game_data.CITIES.forEach(function(city){
 
             // in range filter
             var rangeReply = hasRange($scope.aircraft, city.position);
-            if($scope.filters.inRange && !rangeReply.success) return;
-
-            // % of avg filter
-            var avgPercent = co.modifier * 100;
-            if($scope.filters.avgMin < avgPercent || avgPercent > $scope.filters.avgMax) return;
+            if($scope.wm.filters.inRange && !rangeReply.success) return;
 
             // distance filter
-            if($scope.filters.distanceMin < rangeReply.dist.km || rangeReply.dist.km > $scope.filters.distanceMax) return;
+            if($scope.wm.filters.distanceMin < rangeReply.dist.km || rangeReply.dist.km > $scope.wm.filters.distanceMax) return;
 
             city.market.forEach(function(co){
 
-                $scope.marketRows.push({
-                    name: co.name,
-                    price: co.price,
-                    avgPercent: avgPercent,
-                    cityDistance: rangeReply.dist.km,
-                    cityId: city.id,
-                    cityName: city.name,
-                });
+                // commodity filter
+                if($scope.wm.filters.commodities.length > 0 && $scope.wm.filters.commodities.indexOf(co.id) == -1 ) return;
+
+                // % of avg filter
+                var avgPercent = co.modifier * 100;
+                if($scope.wm.filters.avgMin < avgPercent || avgPercent > $scope.wm.filters.avgMax) return;
+
+                // price filter
+                if($scope.wm.filters.priceMin < co.price || co.price > $scope.wm.filters.priceMax) return;
+
+                $scope.marketRows[city.id+'_'+co.id].price = co.price;
+                $scope.marketRows[city.id+'_'+co.id].avgPercent = avgPercent;
+                $scope.marketRows[city.id+'_'+co.id].cityDistance = rangeReply.dist.km;
 
             });
 

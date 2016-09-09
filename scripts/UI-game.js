@@ -16,7 +16,7 @@ app.controller('MenuUIController', function UIController($scope) {
     };
 
 
-
+    ///// WORLD MARKET WINDOW /////
 
     $scope.wm = {
         isActive: false,
@@ -34,7 +34,7 @@ app.controller('MenuUIController', function UIController($scope) {
     };
     game_data.CITIES.forEach(function(city){
         city.market.forEach(function(co){
-            $scope.marketRows[city.id+'_'+co.id] = {
+            $scope.wm.marketRows[city.id+'_'+co.id] = {
                 name: co.name,
                 price: co.price,
                 avgPercent: 100,
@@ -49,40 +49,62 @@ app.controller('MenuUIController', function UIController($scope) {
         $scope.wm.isActive = true;
         updateMarketData();
         $scope.$apply;
+
+        if(!$scope.wm.windowInited){
+            setTimeout(function(){
+                WindowFactory.initWindow($('#world-market-window'));
+            }, 10);
+            $scope.wm.windowInited = true;
+        }
     }
     $scope.closeWorldMarket = function(){
         $scope.wm.isActive = false;
         $scope.$apply;
+        $scope.wm.windowInited = false;
     }
 
     function updateMarketData(){
 
-        $scope.wm.marketRows = [];
-
         game_data.CITIES.forEach(function(city){
 
-            // in range filter
             var rangeReply = hasRange($scope.aircraft, city.position);
-            if($scope.wm.filters.inRange && !rangeReply.success) return;
+            if(
+                // in range filter
+                ($scope.wm.filters.inRange && !rangeReply.success)
+                ||
 
-            // distance filter
-            if($scope.wm.filters.distanceMin < rangeReply.dist.km || rangeReply.dist.km > $scope.wm.filters.distanceMax) return;
+                // distance filter
+                (rangeReply.dist.km < $scope.wm.filters.distanceMin || rangeReply.dist.km > $scope.wm.filters.distanceMax)
+            ){
+                city.market.forEach(function(co){
+                    $scope.wm.marketRows[city.id+'_'+co.id].isActive = false;
+                });
+                return;
+            }
 
             city.market.forEach(function(co){
 
-                // commodity filter
-                if($scope.wm.filters.commodities.length > 0 && $scope.wm.filters.commodities.indexOf(co.id) == -1 ) return;
+                var avgPercent = Math.round(co.modifier * 100);
+                if(
+                    // commodity filter
+                    ($scope.wm.filters.commodities.length > 0 && $scope.wm.filters.commodities.indexOf(co.id) == -1)
+                    ||
 
-                // % of avg filter
-                var avgPercent = co.modifier * 100;
-                if($scope.wm.filters.avgMin < avgPercent || avgPercent > $scope.wm.filters.avgMax) return;
+                    // % of avg filter
+                    (avgPercent < $scope.wm.filters.avgMin || avgPercent > $scope.wm.filters.avgMax)
+                    ||
 
-                // price filter
-                if($scope.wm.filters.priceMin < co.price || co.price > $scope.wm.filters.priceMax) return;
+                    // price filter
+                    (co.price < $scope.wm.filters.priceMin || co.price > $scope.wm.filters.priceMax)
+                ){
+                    $scope.wm.marketRows[city.id+'_'+co.id].isActive = false;
+                    return;
+                }
 
-                $scope.marketRows[city.id+'_'+co.id].price = co.price;
-                $scope.marketRows[city.id+'_'+co.id].avgPercent = avgPercent;
-                $scope.marketRows[city.id+'_'+co.id].cityDistance = rangeReply.dist.km;
+                $scope.wm.marketRows[city.id+'_'+co.id].price = co.price;
+                $scope.wm.marketRows[city.id+'_'+co.id].avgPercent = avgPercent;
+                $scope.wm.marketRows[city.id+'_'+co.id].cityDistance = Math.round(rangeReply.dist.km);
+                $scope.wm.marketRows[city.id+'_'+co.id].isActive = true;
 
             });
 
@@ -91,10 +113,14 @@ app.controller('MenuUIController', function UIController($scope) {
         $scope.$apply;
     }
 
-    $scope.flyToCity= function($event){
+    $scope.flyToCity = function($event){
         flyToCityId(angular.element($event.currentTarget).attr('cityId'));
     }
-    $(document).on('longScreenUpdate', function(){ if($scope.isActive) updateMarketData(); });
+    $scope.toggleWorldMarketFilters = function(){
+        $('#world-market-filters').slideToggle();
+        $('#worldMarketFilterBtn').toggleClass('active');
+    }
+    $(document).on('longScreenUpdate', function(){ if($scope.wm.isActive) updateMarketData(); });
 });
 
 app.controller('InfoUIController', function UIController($scope) {

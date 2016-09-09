@@ -215,6 +215,10 @@ select, input, textarea {
     font-size: 2em;
     z-index: 50;
 }
+    #top-menu .center-xy {
+        top: 50vh;
+        left: 50vw;
+    }
     #top-menu-icons {
         position: absolute;
     }
@@ -256,6 +260,55 @@ select, input, textarea {
         z-index:1;
         padding: 0.4em;
     }
+
+#worldMarketFilterBtn.active {
+    border-radius: 0;
+    background: #eee;
+    color: #333;
+}
+    #worldMarketFilterBtn .fa-filter:before {
+        margin-right: 0.5em;
+    }
+#world-market-filters {
+    position: absolute;
+    background: #eee;
+    left: 0;
+    top: 2em;
+    font-size: 1rem;
+    border-bottom: 2px #333 solid;
+    text-align: center;
+    display: none;
+    width: 100%;
+}
+    #world-market-filters table{
+        width: 100%;
+    }
+        #world-market-filters td {
+            border-bottom: 1px #333 solid;
+            padding: 0.5em
+        }
+            #world-market-filters input[type="number"] {
+                width: 4em;
+                margin: 0 1em;
+                padding: 0.2em;
+            }
+
+
+    #world-market {
+            font-size: 1rem;
+    }
+        #world-market th {
+            padding: 0 0.33em 0.5em;
+            white-space: nowrap;
+        }
+        #world-market td {
+            text-align: center;
+            padding: 0.2em 0.5em;
+        }
+        #world-market td[ng-click] {
+            text-decoration: underline;
+            cursor:pointer;
+        }
 
 
 /* bottom menu */
@@ -381,10 +434,10 @@ select, input, textarea {
     background: #fff;
     border: 3px #333 solid;
     border-radius: 6px;
-    font-size: 1.5em;
-    max-width: 90%;
+    font-size: 1.5rem;
+    max-width: 90vw;
     z-index: 46;
-    max-height: 90%;
+    max-height: 90vh;
     overflow: hidden;
     box-shadow: 0px 0px 5px 0px rgba(0,0,0,0.5);
 }

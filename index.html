@@ -24,10 +24,36 @@
                     <div id="profile-tab" class="ui-item-tr view-tab ui-btn">Profile</div>
                     <div id="world-market-window" class="window center-xy" ng-if="wm.isActive">
                         <div class="windowHeader">
-                            World Market <span id="worldMarketFilterBtn" class="windowButton" ng-click="openWorldMarketFilter()">Filter</span>
+                            World Market <span id="worldMarketFilterBtn" class="windowButton fa fa-filter" ng-click="toggleWorldMarketFilters()">Filter</span>
                             <span class="windowClose" ng-click="closeWorldMarket()">x</span>
                         </div>
                         <div class="windowContent scrollable">
+                            <div id="world-market-filters"><table>
+                                <tr>
+                                    <td colspan="5"><label><input type="checkbox" ng-model="wm.filters.inRange">In Range Only</label></td>
+                                </tr>
+                                <tr>
+                                    <td class="gray">Min</td>
+                                    <td><input type="number" ng-model="wm.filters.avgMin"></td>
+                                    <td>% of Average Price</td>
+                                    <td><input type="number" ng-model="wm.filters.avgMax"></td>
+                                    <td class="gray">Max</td>
+                                </tr>
+                                <tr>
+                                    <td class="gray">Min</td>
+                                    <td><input type="number" ng-model="wm.filters.distanceMin"></td>
+                                    <td>Distance</td>
+                                    <td><input type="number" ng-model="wm.filters.distanceMax"></td>
+                                    <td class="gray">Max</td>
+                                </tr>
+                                <tr>
+                                    <td class="gray">Min</td>
+                                    <td><input type="number" step="0.01" ng-model="wm.filters.priceMin"></td>
+                                    <td>Price</td>
+                                    <td><input type="number" step="0.01" ng-model="wm.filters.priceMax"></td>
+                                    <td class="gray">Max</td>
+                                </tr>
+                            </table></div>
                             <table id="world-market" class="tablesorter">
                                 <thead>
                                     <tr>
@@ -39,12 +65,12 @@
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr ng-repeat="row in wm.marketRows">
-                                        <td>row.name</td>
-                                        <td>row.price</td>
-                                        <td>row.avgPercent</td>
-                                        <td>row.cityDistance</td>
-                                        <td ng-click="flyToCity($event)" cityId="row.cityId">row.cityName</td>
+                                    <tr ng-repeat="row in wm.marketRows" ng-if="row.isActive">
+                                        <td>{{row.name}}</td>
+                                        <td>{{getMoney(row.price, true)}}</td>
+                                        <td>{{row.avgPercent}} %</td>
+                                        <td>{{row.cityDistance}} km</td>
+                                        <td ng-click="flyToCity($event)" cityId="row.cityId">{{row.cityName}}</td>
                                     </tr>
                                 </tbody>
                             </table>

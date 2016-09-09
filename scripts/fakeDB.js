@@ -6902,7 +6902,7 @@ function getDB(){
             var amount = Math.round(required * (Math.random()*2+4) );
 
             // set the market price
-            var price = getCommodityPrice(amount, required, co.base_price);
+            var price = getCommodityPrice(amount, required, co.base_price).price;
 
             var marketCommodity = cloneObject(co);
             marketCommodity.amount = amount;

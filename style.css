@@ -529,7 +529,7 @@ select, input, textarea {
     width: 90%;
     max-width: 1000px;
     background: #e3dfcf;
-    max-height: 98vh;
+    height: 85%;
     border: 10px #333 solid;
     border-radius: 20px;
     box-shadow: 0px 0px 10px 0px #ddd;

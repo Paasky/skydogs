@@ -4,8 +4,6 @@ app.controller('MenuUIController', function UIController($scope) {
 
     $scope.city = game_data.CITIES.get(1);
     $scope.country = $scope.city.getCountry();
-    $scope.player = game_data.PLAYERS.get(game_data.player_settings.id);
-    $scope.aircraft = $scope.player.getAircraft();
     $scope.getMoney = getMoney;
 
     $scope.toggleMenu = function(){
@@ -89,10 +87,12 @@ app.controller('MenuUIController', function UIController($scope) {
     }
 
     function updateMarketData(){
+        var player = game_data.PLAYERS.get(game_data.player_settings.id);
+        var aircraft = player.getAircraft();
 
         game_data.CITIES.forEach(function(city){
 
-            var rangeReply = hasRange($scope.aircraft, city.position);
+            var rangeReply = hasRange(aircraft, city.position);
             if(
                 // in range filter
                 ($scope.wm.filters.inRange && !rangeReply.success)

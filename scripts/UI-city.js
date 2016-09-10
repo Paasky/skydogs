@@ -41,12 +41,10 @@ app.controller('CityUIController', function UIController($scope) {
     $(document).on('cityLeave', function(e, aircraftId){
         if($scope.aircraft.id != aircraftId) return;
 
-        $scope.$apply(function(){
-            $scope.isActive = false;
-            $scope.market.isActive = false;
-            $scope.market.shop.isActive = false;
-            $('#cityScreen').fadeOut();
-        });
+        $scope.isActive = false;
+        $scope.market.isActive = false;
+        $scope.market.shop.isActive = false;
+        $('#cityScreen').fadeOut();
     });
 
 
@@ -167,7 +165,7 @@ app.controller('CityUIController', function UIController($scope) {
         }
     }
 
-    $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click($scope.closeCityMarket);
+    $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click(function(){$scope.$apply($scope.closeCityMarket)});
 });
 
 

@@ -28,33 +28,24 @@
                             <span class="windowClose" ng-click="closeWorldMarket()">x</span>
                         </div>
                         <div class="windowContent scrollable">
-                            <div id="world-market-filters"><table>
-                                <tr>
-                                    <td colspan="5"><label><input type="checkbox" ng-model="wm.filters.inRange">In Range Only</label></td>
-                                </tr>
-                                <tr>
-                                    <td class="gray">Min</td>
-                                    <td><input type="number" ng-model="wm.filters.avgMin"></td>
-                                    <td>% of Average Price</td>
-                                    <td><input type="number" ng-model="wm.filters.avgMax"></td>
-                                    <td class="gray">Max</td>
-                                </tr>
-                                <tr>
-                                    <td class="gray">Min</td>
-                                    <td><input type="number" ng-model="wm.filters.distanceMin"></td>
-                                    <td>Distance</td>
-                                    <td><input type="number" ng-model="wm.filters.distanceMax"></td>
-                                    <td class="gray">Max</td>
-                                </tr>
-                                <tr>
-                                    <td class="gray">Min</td>
-                                    <td><input type="number" step="0.01" ng-model="wm.filters.priceMin"></td>
-                                    <td>Price</td>
-                                    <td><input type="number" step="0.01" ng-model="wm.filters.priceMax"></td>
-                                    <td class="gray">Max</td>
-                                </tr>
-                            </table></div>
-                            <table id="world-market" class="tablesorter">
+                            <div id="world-market-filters">
+                                <div>
+                                    <p><label><input type="checkbox" ng-model="wm.filters.inRange">In Range Only</label></p>
+                                </div>
+                                <div>
+                                    <p>% of Average Price</p>
+                                    <rzslider rz-slider-model="wm.filters.avgMin" rz-slider-high="wm.filters.avgMax" rz-slider-options="wm.filters.avgOptions"></rzslider>
+                                </div>
+                                <div>
+                                    <p>Distance</p>
+                                    <rzslider rz-slider-model="wm.filters.distanceMin" rz-slider-high="wm.filters.distanceMax" rz-slider-options="wm.filters.distanceOptions"></rzslider>
+                                </div>
+                                <div>
+                                    <p>Price</p>
+                                    <rzslider rz-slider-model="wm.filters.priceMin" rz-slider-high="wm.filters.priceMax" rz-slider-options="wm.filters.priceOptions"></rzslider>
+                                </div>
+                            </div>
+                            <table id="world-market" class="tablesorter" ng-if="wm.isActive">
                                 <thead>
                                     <tr>
                                         <th>Name</th>
@@ -70,7 +61,7 @@
                                         <td>{{getMoney(row.price, true)}}</td>
                                         <td>{{row.avgPercent}} %</td>
                                         <td>{{row.cityDistance}} km</td>
-                                        <td ng-click="flyToCity($event)" cityId="row.cityId">{{row.cityName}}</td>
+                                        <td ng-click="flyToCity($event)" cityId="{{row.cityId}}">{{row.cityName}}</td>
                                     </tr>
                                 </tbody>
                             </table>
@@ -222,12 +213,15 @@
             </div>
         </div>
         <script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.4.8/angular.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angular-ui-bootstrap/0.14.3/ui-bootstrap-tpls.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.0/rzslider.min.js"></script>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
         <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.22.0/mapbox-gl.js'></script>
         <script src='lib/turf.min.js'></script>
         <script src='lib/jquery.tablesorter.min.js'></script>
         <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.22.0/mapbox-gl.css' rel='stylesheet' />
         <link href='lib/font-awesome-4.6.3/css/font-awesome.min.css' rel='stylesheet' />
+        <link rel="stylesheet" type="text/css" href="https://cdnjs.cloudflare.com/ajax/libs/angularjs-slider/5.5.0/rzslider.css"/>
         <script src="scripts/common.js"></script>
         <script src="scripts/objects.js"></script>
         <script>$('#loading-message').css('opacity', 0.5);</script>

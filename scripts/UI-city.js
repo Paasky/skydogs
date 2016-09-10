@@ -28,25 +28,25 @@ app.controller('CityUIController', function UIController($scope) {
 
     $(document).on('cityArrive', function(e, data){
         if(data.player_id != game_data.player_settings.id) return;
-        $scope.city = game_data.CITIES.get(data.city_id);
-        $scope.country = $scope.city.getCountry();
-        $scope.flagUrl = getFlagUrl($scope.country.flag_file);
-        $scope.css = 'background:'+$scope.country.color1+';color:'+$scope.country.color2;
+        $scope.$apply(function(){
+            $scope.city = game_data.CITIES.get(data.city_id);
+            $scope.country = $scope.city.getCountry();
+            $scope.flagUrl = getFlagUrl($scope.country.flag_file);
+            $scope.css = 'background:'+$scope.country.color1+';color:'+$scope.country.color2;
 
-        $('#cityScreen').fadeIn();
-
-        $scope.$apply();
+            $('#cityScreen').fadeIn();
+        });
     });
 
     $(document).on('cityLeave', function(e, aircraftId){
         if($scope.aircraft.id != aircraftId) return;
 
-        $scope.isActive = false;
-        $scope.market.isActive = false;
-        $scope.market.shop.isActive = false;
-        $('#cityScreen').fadeOut();
-
-        $scope.$apply();
+        $scope.$apply(function(){
+            $scope.isActive = false;
+            $scope.market.isActive = false;
+            $scope.market.shop.isActive = false;
+            $('#cityScreen').fadeOut();
+        });
     });
 
 
@@ -55,12 +55,10 @@ app.controller('CityUIController', function UIController($scope) {
 
     $scope.openCityMarket = function(){
         $scope.market.isActive = true;
-        $scope.$apply;
     }
     $scope.closeCityMarket = function(){
         $scope.market.isActive = false;
         $scope.market.shop.isActive = false;
-        $scope.$apply;
     }
 
     // css getters
@@ -111,7 +109,6 @@ app.controller('CityUIController', function UIController($scope) {
 
         // activate the market shop
         $scope.market.shop.isActive = true;
-        $scope.$apply;
 
         if(!$scope.market.shop.windowInited){
             setTimeout(function(){
@@ -123,7 +120,6 @@ app.controller('CityUIController', function UIController($scope) {
     $scope.closeCityMarketShop = function(){
         $scope.market.shop.isActive = false;
         $scope.market.shop.windowInited = false;
-        $scope.$apply;
     }
 
     // confirm the purchase/sale
@@ -172,7 +168,6 @@ app.controller('CityUIController', function UIController($scope) {
     }
 
     $('#cityScreenLeft>.cityScreen-btn:not(#cityScreen-marketBtn)').click($scope.closeCityMarket);
-    $(document).on('longScreenUpdate', function(){ $scope.$apply; });
 });
 
 

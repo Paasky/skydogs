@@ -1,5 +1,5 @@
 
-var app = angular.module('skyDogs', []);
+var app = angular.module('skyDogs', ['rzModule', 'ui.bootstrap']);
 
 $(document).mousemove(function(event) {
     game_data.player_settings.mouse_position.x = event.pageX;

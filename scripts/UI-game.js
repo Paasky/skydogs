@@ -24,10 +24,35 @@ app.controller('MenuUIController', function UIController($scope) {
             inRange: true,
             avgMin: 50,
             avgMax: 200,
+            avgOptions: {
+                ceil: 200,
+                floor: 50,
+                draggableRange: true,
+                translate: function (value) {
+                    return value + ' %';
+                }
+            },
             distanceMin: 0,
             distanceMax: 5000,
+            distanceOptions: {
+                ceil: 5000,
+                floor: 0,
+                draggableRange: true,
+                translate: function (value) {
+                    return value + ' km';
+                }
+            },
             priceMin: 0,
             priceMax: 20,
+            priceOptions: {
+                ceil: 20,
+                floor: 0,
+                step: 0.1,
+                draggableRange: true,
+                translate: function (value) {
+                    return '$ '+value;
+                }
+            },
             commodities: [],
         },
         marketRows: {},
@@ -109,8 +134,6 @@ app.controller('MenuUIController', function UIController($scope) {
             });
 
         });
-
-        $scope.$apply;
     }
 
     $scope.flyToCity = function($event){
@@ -119,8 +142,12 @@ app.controller('MenuUIController', function UIController($scope) {
     $scope.toggleWorldMarketFilters = function(){
         $('#world-market-filters').slideToggle();
         $('#worldMarketFilterBtn').toggleClass('active');
+        $scope.$broadcast('rzSliderForceRender');
     }
-    $(document).on('longScreenUpdate', function(){ if($scope.wm.isActive) updateMarketData(); });
+    $(document).on('longScreenUpdate', function(){
+        if(!$scope.wm.isActive) return;
+        $scope.$apply(updateMarketData);
+    });
 });
 
 app.controller('InfoUIController', function UIController($scope) {

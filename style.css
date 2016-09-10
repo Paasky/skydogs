@@ -261,31 +261,39 @@ select, input, textarea {
         padding: 0.4em;
     }
 
-#worldMarketFilterBtn.active {
-    border-radius: 0;
-    background: #eee;
-    color: #333;
+#world-market-window {
+    min-height: 17em;
+    width: 20em;
 }
-    #worldMarketFilterBtn .fa-filter:before {
-        margin-right: 0.5em;
+    #worldMarketFilterBtn.active {
+        border-radius: 0;
+        background: #eee;
+        color: #333;
     }
-#world-market-filters {
-    position: absolute;
-    background: #eee;
-    left: 0;
-    top: 2em;
-    font-size: 1rem;
-    border-bottom: 2px #333 solid;
-    text-align: center;
-    display: none;
-    width: 100%;
-}
-    #world-market-filters table{
-        width: 100%;
+        #worldMarketFilterBtn .fa-filter:before {
+            margin-right: 0.5em;
+        }
+    #world-market-filters {
+        position: absolute;
+        background: #eee;
+        left: 0;
+        top: 2em;
+        font-size: 1rem;
+        border-bottom: 2px #333 solid;
+        text-align: center;
+        display: none;
+        width: 96%;
+        padding: 2%;
     }
-        #world-market-filters td {
-            border-bottom: 1px #333 solid;
-            padding: 0.5em
+        #world-market-filters div p {
+            margin: 1em 0 0;
+            padding: 1em 0 0;
+            border-top: 1px #333 solid;
+        }
+        #world-market-filters div:first-child p {
+            margin: 0;
+            padding: 0;
+            border-top: 0;
         }
             #world-market-filters input[type="number"] {
                 width: 4em;
@@ -294,21 +302,22 @@ select, input, textarea {
             }
 
 
-    #world-market {
+        #world-market {
             font-size: 1rem;
-    }
-        #world-market th {
-            padding: 0 0.33em 0.5em;
-            white-space: nowrap;
+            min-height: 15em;
         }
-        #world-market td {
-            text-align: center;
-            padding: 0.2em 0.5em;
-        }
-        #world-market td[ng-click] {
-            text-decoration: underline;
-            cursor:pointer;
-        }
+            #world-market th {
+                padding: 0 0.33em 0.5em;
+                white-space: nowrap;
+            }
+            #world-market td {
+                text-align: center;
+                padding: 0.2em 0.5em;
+            }
+            #world-market td[ng-click] {
+                text-decoration: underline;
+                cursor:pointer;
+            }
 
 
 /* bottom menu */

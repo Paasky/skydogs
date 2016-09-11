@@ -134,6 +134,15 @@ app.controller('MenuUIController', function UIController($scope) {
             });
 
         });
+        setTimeout(function(){
+            $('#world-market').tablesorter({
+                headers: {
+                    3: {
+                        sorter:'km'
+                    }
+                }
+            });
+        },10);
     }
 
     $scope.flyToCity = function($event){

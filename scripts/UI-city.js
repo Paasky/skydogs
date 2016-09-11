@@ -53,6 +53,7 @@ app.controller('CityUIController', function UIController($scope) {
 
     $scope.openCityMarket = function(){
         $scope.market.isActive = true;
+        setTimeout(function(){ $('#cityScreenMarket').tablesorter(); },10);
     }
     $scope.closeCityMarket = function(){
         $scope.market.isActive = false;

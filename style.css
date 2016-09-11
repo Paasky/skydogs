@@ -7,16 +7,16 @@ body {
 }
 
 table{ border-spacing: 0; }
-    table.tablesorter thead tr:nth-child(2) .header {
+    table.tablesorter thead .header {
         background-image: url(lib/bg.gif);
         background-repeat: no-repeat;
         background-position: center right;
         cursor: pointer;
     }
-    table.tablesorter thead tr:nth-child(2) .headerSortUp {
+    table.tablesorter thead .headerSortUp {
         background-image: url(lib/asc.gif);
     }
-    table.tablesorter thead tr:nth-child(2) .headerSortDown {
+    table.tablesorter thead .headerSortDown {
         background-image: url(lib/desc.gif);
     }
         /* legacy */
@@ -263,7 +263,7 @@ select, input, textarea {
 
 #world-market-window {
     min-height: 17em;
-    width: 20em;
+    width: 21em;
 }
     #worldMarketFilterBtn.active {
         border-radius: 0;
@@ -305,10 +305,15 @@ select, input, textarea {
         #world-market {
             font-size: 1rem;
             min-height: 15em;
+            width: 100%;
         }
             #world-market th {
-                padding: 0 0.33em 0.5em;
                 white-space: nowrap;
+            }
+            #world-market th:nth-child(2),
+            #world-market th:nth-child(3),
+            #world-market th:nth-child(4) {
+                padding-right: 1em;
             }
             #world-market td {
                 text-align: center;

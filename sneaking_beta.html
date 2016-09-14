@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html lang="en-US">
+    <head>
+        <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+        <style>
+            .invisible {
+                opacity: 0;
+            }
+        </style>
+    </head>
+    <body>
+        <div id="server_view"></div>
+        <div id="player_view"></div>
+        <div id="buttons">
+            <button id="reset">Reset</button>
+            <button id="toggleView">Toggle Server View</button>
+        </div>
+        <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
+        <script>
+            var map = [
+                [ 'B','B','B','E','B','B','E','B','B' ],
+                [ 'B','P','P','P','P','P','P','P','B' ],
+                [ 'E','P','B','B','P','B','B','P','E' ],
+                [ 'B','P','B','B','P','B','B','P','B' ],
+                [ 'B','P','P','P','P','P','B','P','B' ],
+                [ 'E','P','B','B','B','P','P','P','E' ],
+                [ 'B','P','B','P','P','P','B','B','B' ],
+                [ 'B','P','P','P','B','P','P','P','E' ],
+                [ 'B','B','B','E','B','B','E','B','B' ],
+            ];
+            var map_buildings = [];
+
+            $('#toggleView').click(function(){
+                $('#server_view').toggleClass('invisible');
+            });
+
+            function drawMaps(){
+                var map_html = '';
+
+                map.forEach(function(row, row_i){
+                    map_html += '<div class="row">';
+                    row.forEach(function(block, col_i){
+                        var block_id = 'block_'+row_i+'_'+col_i;
+
+                        if(block=='B') map_buildings.push({row: row_i, col: col_i, block_id: block_id});
+
+                        map_html += '<div class="block block_'+block+' id="'+block_id+'">';
+                    });
+                    map_html += '</div>';
+                });
+                $('#server_view').html(map_html);
+                $('#player_view').html(map_html).attr('stage', 'choose_entrance');
+            }
+            function chooseEntrance(){
+                var block = $(this);
+                if(!block.hasClass('block_E')){
+                    alert('Not an entrance block!');
+                    return false;
+                }
+                block.addClass('chosen_entrance').addClass('current_location');
+                setClickable();
+                $('#player_view').html(map_html).attr('stage', 'next_step');
+            }
+            function setClickable(){
+                $('.block').removeClass('clickable');
+                var row = parseInt($('.current_location').attr('row'));
+                var col = parseInt($('.current_location').attr('col'));
+                var rows = [row-1, row, row+1];
+                var cols = [col-1, col, col+1];
+                rows.forEach(function(row_i){
+                    cols.forEach(function(col_i){
+                        if(row==row_i && col==col_i) return;
+
+                        $('#block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
+                    });
+                });
+            }
+            function pickDestination(){
+                var destination = map_buildings[ Math.floor(Math.random()*map_buildings.length) ];
+                var block = $('#'+destination.block_id);
+                block.addClass('destination');
+            }
+            function moveToBlock(){
+                var block = $(this);
+                if(!block.hasClass('clickable')){
+                    alert('Not a clickable block!');
+                    return false;
+                }
+
+            }
+        </script>
+
+    </body>
+</html>

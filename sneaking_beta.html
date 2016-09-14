@@ -22,20 +22,33 @@
         opacity: 0.5;
         position: relative;
     }
+    .block_P {
+        background: #eee;
+    }
     .block_B {
-        background: #ddd
+        background: #bbb;
     }
     .block_E {
-        background: #cec
+        background: #cec;
+    }
+    .block:before {
+        position: absolute;
     }
 
     .guard:before {
         content: 'x';
-        position: absolute;
         line-height: 0.9em;
         width: 1.1em;
         text-align: center;
         color: #d00;
+    }
+    .block[surroundingGuards]:before {
+        content: attr(surroundingGuards);
+        font-size: 0.5em;
+        line-height: 2em;
+        width: 2em;
+        text-align: center;
+        color: #700;
     }
 
 
@@ -43,13 +56,14 @@
     /* stage = choose_entrance */
 
     [stage="choose_entrance"]:before {
-        content: 'Choose an entrance';
         position: absolute;
+        content: 'Choose an entrance';
         top: 50%;
         text-align: center;
         width: 100%;
         font-size: 1.5em;
-        opacity: 0.75;
+        opacity: 0.5;
+        z-index: 1;
     }
     [stage="choose_entrance"] .block_E {
         border-color: #000;
@@ -78,7 +92,6 @@
         width: 0.8em;
         height: 0.8em;
         content: '';
-        position: absolute;
         top: 0.1em;
         left: 0.1em;
         box-shadow: 0 0 5px 1px rgba(0,0,0,0.5);
@@ -93,11 +106,16 @@
         box-shadow: 0 0 5px 2px rgba(0,0,0,1) inset;
     }
 
+    .visited {
+        opacity: 1;
+        border-color: #090;
+    }
+
 
 </style>
     </head>
     <body>
-        <div id="server_view"></div>
+        <div id="server_view" class="invisible"></div>
         <div id="player_view"></div>
         <div id="buttons">
             <button id="reset">Reset</button>
@@ -105,16 +123,26 @@
         </div>
         <script src="https://code.jquery.com/jquery-3.1.0.min.js"></script>
         <script>
+            var gameOver = false;
             var map = [
-                [ 'B','B','B','E','B','B','E','B','B' ],
-                [ 'B','P','P','P','P','P','P','P','B' ],
-                [ 'E','P','B','B','P','B','B','P','E' ],
-                [ 'B','P','B','B','P','B','B','P','B' ],
-                [ 'B','P','P','P','P','P','B','P','B' ],
-                [ 'E','P','B','B','B','P','P','P','E' ],
-                [ 'B','P','B','P','P','P','B','B','B' ],
-                [ 'B','P','P','P','B','P','P','P','E' ],
-                [ 'B','B','B','E','B','B','E','B','B' ],
+                [ 'P','P','P','P','P','P','E','P','P','P','P','P','P','E','P','P' ],
+                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','P','P','P' ],
+                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
+                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
+                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
+                [ 'E','P','B','B','B','P','P','P','P','B','B','B','P','P','P','E' ],
+                [ 'P','P','B','P','P','P','B','B','P','B','P','P','P','B','B','P' ],
+                [ 'P','P','P','P','B','P','P','P','P','P','P','B','P','P','P','P' ],
+                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','P','P','P' ],
+                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
+                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
+                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
+                [ 'P','P','B','B','B','P','P','P','P','B','B','B','P','P','P','E' ],
+                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
+                [ 'E','P','B','B','B','P','P','P','P','B','B','B','P','P','P','P' ],
+                [ 'P','P','B','P','P','P','B','B','P','B','P','P','P','B','B','P' ],
+                [ 'P','P','P','P','B','P','P','P','P','P','P','B','P','P','P','P' ],
+                [ 'P','P','P','P','P','P','E','P','P','P','P','P','P','E','P','P' ],
             ];
             var map_buildings = [];
             var map_paths = [];
@@ -126,6 +154,8 @@
             });
 
             function drawMaps(){
+                gameOver = false;
+                $('#server_view').addClass('invisible');
                 var map_html = '';
 
                 map.forEach(function(row, row_i){
@@ -143,7 +173,11 @@
                 $('#server_view').html(map_html);
                 $('#player_view').html(map_html).attr('stage', 'choose_entrance');
             }
+
+
             function chooseEntrance(){
+                if(gameOver) return;
+
                 if($('#player_view[stage="choose_entrance"]').length==0) return;
                 var block = $(this);
                 if(!block.hasClass('block_E')){
@@ -151,10 +185,15 @@
                     return false;
                 }
                 block.addClass('chosen_entrance').addClass('current_location');
+                $('#server_view #'+block.attr('id')).addClass('chosen_entrance').addClass('current_location');
                 setupBoard();
             }
             $('#player_view').on('click', '.block_E', chooseEntrance);
-            function setClickable(){
+
+
+            function setClickables(){
+                if(gameOver) return;
+
                 $('#player_view .block').removeClass('clickable');
                 var row = parseInt($('.current_location').attr('row'));
                 var col = parseInt($('.current_location').attr('col'));
@@ -168,34 +207,99 @@
                     });
                 });
             }
+
+
+            function setServerHints(){
+                if(gameOver) return;
+
+                $('#server_view .block:not(.guard, .destination)').each(function(){
+                    var block = $(this);
+                    var row = parseInt(block.attr('row'));
+                    var col = parseInt(block.attr('col'));
+                    var rows = [row-1, row, row+1];
+                    var cols = [col-1, col, col+1];
+
+                    var surroundingGuards = 0;
+                    rows.forEach(function(row_i){
+                        cols.forEach(function(col_i){
+                            if($('#server_view #block_'+row_i+'_'+col_i).hasClass('guard')) surroundingGuards++;
+                        });
+                    });
+
+                    if(surroundingGuards>0) block.attr('surroundingGuards', surroundingGuards);
+                });
+
+            }
+
+
             function setupBoard(){
+                if(gameOver) return;
 
                 // set destination
-                var destination = map_buildings[ Math.floor(Math.random()*map_buildings.length) ];
-                var block = $('#player_view #'+destination.block_id+', #server_view #'+destination.block_id);
-                block.addClass('destination');
+                var numRows = map.length-1;
+                var numCols = map[0].length-1;
+                var possibleDestinationBlocks = $('#player_view .block_B:not([row="0"], [row="'+numRows+'"], [col="0"], [col="'+numCols+'"])');
+                var destination = possibleDestinationBlocks.eq( Math.floor(Math.random()*possibleDestinationBlocks.length) );
+                destination.addClass('destination');
+                $('#server_view #'+destination.attr('id')).addClass('destination');
 
                 // add guards
-                var plots = $('#server_view .block_P, #server_view .block_B:not(.destination)');
-                plots = shuffleArray(plots);
-                var guards = 10;
-                var guardedPlots = $(plots.splice(0,guards));
+                var difficulty = 5;
+                var guards = ( numRows+numCols ) * ( 1+( difficulty/10 ) );
 
-                guardedPlots.addClass('guard');
+                var possibleGuardedBlocks = $('#server_view .block_P:not([row="0"], [row="'+numRows+'"], [col="0"], [col="'+numCols+'"])');
+                possibleGuardedBlocks = shuffleArray(possibleGuardedBlocks);
+                var guardedBlocks = $(possibleGuardedBlocks.splice(0,guards));
 
+                guardedBlocks.addClass('guard');
 
+                setServerHints();
+                setHint();
 
-                setClickable();
+                setClickables();
                 $('#player_view').attr('stage', 'next_step');
             }
+
+
             function moveToBlock(){
+                if(gameOver) return;
+
                 var block = $(this);
                 if(!block.hasClass('clickable')){
                     alert('Not a clickable block!');
                     return false;
                 }
+                var server_block = $('#server_view #'+block.attr('id'));
+                if(server_block.hasClass('guard')){
+                    alert('Game Over!');
+                    gameOver = true;
+                    $('#server_view').removeClass('invisible');
+                    return false;
+                }
+                if(server_block.hasClass('destination')){
+                    alert('You Win!');
+                    gameOver = true;
+                    $('#server_view').removeClass('invisible');
+                    return false;
+                }
+
+                $('.current_location').removeClass('current_location');
+                block.addClass('current_location').addClass('visited');
+                $('#server_view #'+block.attr('id')).addClass('current_location');
+                setClickables();
+                setHint();
 
             }
+            $('#player_view').on('click', '.clickable', moveToBlock);
+
+
+            function setHint(){
+                if(gameOver) return;
+
+                var surroundingGuards = $('#server_view .current_location').attr('surroundingGuards');
+                if(surroundingGuards) $('#player_view .current_location').attr('surroundingGuards', surroundingGuards);
+            }
+
 
             function shuffleArray(array) {
                 for (var i = array.length - 1; i > 0; i--) {

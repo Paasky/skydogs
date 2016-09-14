@@ -2,11 +2,99 @@
 <html lang="en-US">
     <head>
         <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
-        <style>
-            .invisible {
-                opacity: 0;
-            }
-        </style>
+<style>
+    .invisible {
+        opacity: 0;
+    }
+    #server_view, #player_view {
+        font-size: 20px;
+        display: inline-block;
+        border: 2px #333 solid;
+        line-height: 0em;
+        position: relative;
+    }
+    .block {
+        font-size: 2em;
+        height: 1em;
+        width: 1em;
+        display: inline-block;
+        border: 1px #ccc solid;
+        opacity: 0.5;
+        position: relative;
+    }
+    .block_B {
+        background: #ddd
+    }
+    .block_E {
+        background: #cec
+    }
+
+    .guard:before {
+        content: 'x';
+        position: absolute;
+        line-height: 0.9em;
+        width: 1.1em;
+        text-align: center;
+        color: #d00;
+    }
+
+
+     /* ----------------------- */
+    /* stage = choose_entrance */
+
+    [stage="choose_entrance"]:before {
+        content: 'Choose an entrance';
+        position: absolute;
+        top: 50%;
+        text-align: center;
+        width: 100%;
+        font-size: 1.5em;
+        opacity: 0.75;
+    }
+    [stage="choose_entrance"] .block_E {
+        border-color: #000;
+        cursor: pointer;
+        box-shadow: 0 0 5px 2px rgba(0,0,0,0.5);
+    }
+    [stage="choose_entrance"] .block_E:hover {
+        opacity: 1;
+    }
+
+
+     /* ------------------ */
+    /* stage = next_step */
+
+    .chosen_entrance {
+        opacity: 1;
+    }
+
+    .destination {
+        opacity: 1;
+    }
+    .destination:before {
+        display: inline-block;
+        background: #0064ff;
+        border-radius: 100%;
+        width: 0.8em;
+        height: 0.8em;
+        content: '';
+        position: absolute;
+        top: 0.1em;
+        left: 0.1em;
+        box-shadow: 0 0 5px 1px rgba(0,0,0,0.5);
+    }
+
+    .clickable {
+        cursor: pointer;
+        box-shadow: 0 0 5px 2px rgba(0,0,0,0.5) inset;
+        z-index: 1;
+    }
+    .clickable:hover {
+        box-shadow: 0 0 5px 2px rgba(0,0,0,1) inset;
+    }
+
+
+</style>
     </head>
     <body>
         <div id="server_view"></div>
@@ -29,6 +117,9 @@
                 [ 'B','B','B','E','B','B','E','B','B' ],
             ];
             var map_buildings = [];
+            var map_paths = [];
+
+            $('#reset').click(drawMaps);
 
             $('#toggleView').click(function(){
                 $('#server_view').toggleClass('invisible');
@@ -43,8 +134,9 @@
                         var block_id = 'block_'+row_i+'_'+col_i;
 
                         if(block=='B') map_buildings.push({row: row_i, col: col_i, block_id: block_id});
+                        if(block=='P') map_paths.push({row: row_i, col: col_i, block_id: block_id});
 
-                        map_html += '<div class="block block_'+block+' id="'+block_id+'">';
+                        map_html += '<div class="block block_'+block+'" id="'+block_id+'" row="'+row_i+'" col="'+col_i+'" />';
                     });
                     map_html += '</div>';
                 });
@@ -52,17 +144,18 @@
                 $('#player_view').html(map_html).attr('stage', 'choose_entrance');
             }
             function chooseEntrance(){
+                if($('#player_view[stage="choose_entrance"]').length==0) return;
                 var block = $(this);
                 if(!block.hasClass('block_E')){
                     alert('Not an entrance block!');
                     return false;
                 }
                 block.addClass('chosen_entrance').addClass('current_location');
-                setClickable();
-                $('#player_view').html(map_html).attr('stage', 'next_step');
+                setupBoard();
             }
+            $('#player_view').on('click', '.block_E', chooseEntrance);
             function setClickable(){
-                $('.block').removeClass('clickable');
+                $('#player_view .block').removeClass('clickable');
                 var row = parseInt($('.current_location').attr('row'));
                 var col = parseInt($('.current_location').attr('col'));
                 var rows = [row-1, row, row+1];
@@ -71,14 +164,31 @@
                     cols.forEach(function(col_i){
                         if(row==row_i && col==col_i) return;
 
-                        $('#block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
+                        $('#player_view #block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
                     });
                 });
             }
-            function pickDestination(){
+            function setupBoard(){
+
+                // set destination
                 var destination = map_buildings[ Math.floor(Math.random()*map_buildings.length) ];
-                var block = $('#'+destination.block_id);
+                var block = $('#player_view #'+destination.block_id);
                 block.addClass('destination');
+
+                // add guards
+                var plots = map_buildings.concat(map_paths);
+                plots = shuffleArray(plots);
+                var guards = 10;
+                var guardedPlots = plots.splice(0,guards);
+
+                guardedPlots.forEach(function(plot){
+                    $('#server_view #'+plot.block_id).addClass('guard');
+                });
+
+
+
+                setClickable();
+                $('#player_view').attr('stage', 'next_step');
             }
             function moveToBlock(){
                 var block = $(this);
@@ -87,6 +197,16 @@
                     return false;
                 }
 
+            }
+
+            function shuffleArray(array) {
+                for (var i = array.length - 1; i > 0; i--) {
+                    var j = Math.floor(Math.random() * (i + 1));
+                    var temp = array[i];
+                    array[i] = array[j];
+                    array[j] = temp;
+                }
+                return array;
             }
         </script>
 

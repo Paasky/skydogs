@@ -1,26 +1,29 @@
 <!DOCTYPE html>
 <html lang="en-US">
     <head>
-        <meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />
+        <!--<meta name='viewport' content='width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no' />-->
 <style>
     .invisible {
         opacity: 0;
     }
     #server_view, #player_view {
-        font-size: 20px;
+        font-size: 40px;
         display: inline-block;
         border: 2px #333 solid;
         line-height: 0em;
         position: relative;
     }
+    .row {
+        height: 1.2em;
+    }
     .block {
-        font-size: 2em;
         height: 1em;
         width: 1em;
         display: inline-block;
-        border: 1px #ccc solid;
+        border: 0.1em #ddd solid;
         opacity: 0.5;
         position: relative;
+        line-height: 1em;
     }
     .block_P {
         background: #eee;
@@ -29,33 +32,38 @@
         background: #bbb;
     }
     .block_E {
-        background: #cec;
+        background: lightblue;
     }
-    .block:before {
+    .block:before, .block:after {
         position: absolute;
+        top: 0;
+        left: 0;
     }
 
-    .guard:before {
+    .guard:after {
         content: 'x';
         line-height: 0.9em;
         width: 1.1em;
         text-align: center;
         color: #d00;
     }
-    .block[surroundingGuards]:before {
+    .block[surroundingGuards]:after {
         content: attr(surroundingGuards);
         font-size: 0.5em;
         line-height: 2em;
         width: 2em;
         text-align: center;
-        color: #700;
+        color: #666;
+    }
+    .block[surroundingGuards="?"]:after {
+        color: red;
     }
 
 
      /* ----------------------- */
     /* stage = choose_entrance */
 
-    [stage="choose_entrance"]:before {
+    [stage="choose_entrance"]:after {
         position: absolute;
         content: 'Choose an entrance';
         top: 50%;
@@ -77,17 +85,9 @@
 
      /* ------------------ */
     /* stage = next_step */
-
-    .chosen_entrance {
-        opacity: 1;
-    }
-
-    .destination {
-        opacity: 1;
-    }
-    .destination:before {
+    .destination:after {
         display: inline-block;
-        background: #0064ff;
+        background: blue;
         border-radius: 100%;
         width: 0.8em;
         height: 0.8em;
@@ -99,11 +99,11 @@
 
     .clickable {
         cursor: pointer;
-        box-shadow: 0 0 5px 2px rgba(0,0,0,0.5) inset;
+        box-shadow: 0 0 0.5em 0 #00f inset;
         z-index: 1;
     }
     .clickable:hover {
-        box-shadow: 0 0 5px 2px rgba(0,0,0,1) inset;
+        box-shadow: 0 0 0.5em 0 #000 inset;
     }
 
     .visited {
@@ -111,12 +111,29 @@
         border-color: #090;
     }
 
+    [stage="next_step"] .safe, [stage="next_step"] .block_B {
+        border: 0.1em darkgreen solid;
+    }
+
+    .current_location {
+        border: 0.1em blue dashed !important;
+        opacity: 1 !important;
+    }
+
+    .guardFlag:after {
+        content:'x' !important;
+        color: red !important;
+        line-height: 0.8em !important;
+        width: 1em !important;
+        text-align: center !important;
+        font-size: inherit !important;
+    }
 
 </style>
     </head>
     <body>
-        <div id="server_view" class="invisible"></div>
         <div id="player_view"></div>
+        <div id="server_view" class="invisible"></div>
         <div id="buttons">
             <button id="reset">Reset</button>
             <button id="toggleView">Toggle Server View</button>
@@ -125,25 +142,24 @@
         <script>
             var gameOver = false;
             var map = [
-                [ 'P','P','P','P','P','P','E','P','P','P','P','P','P','E','P','P' ],
-                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','P','P','P' ],
-                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
-                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
-                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
-                [ 'E','P','B','B','B','P','P','P','P','B','B','B','P','P','P','E' ],
-                [ 'P','P','B','P','P','P','B','B','P','B','P','P','P','B','B','P' ],
-                [ 'P','P','P','P','B','P','P','P','P','P','P','B','P','P','P','P' ],
-                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','P','P','P' ],
-                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
-                [ 'P','P','B','B','P','B','B','P','P','B','B','P','B','B','P','P' ],
-                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
-                [ 'P','P','B','B','B','P','P','P','P','B','B','B','P','P','P','E' ],
-                [ 'P','P','P','P','P','P','B','P','P','P','P','P','P','B','P','P' ],
-                [ 'E','P','B','B','B','P','P','P','P','B','B','B','P','P','P','P' ],
-                [ 'P','P','B','P','P','P','B','B','P','B','P','P','P','B','B','P' ],
-                [ 'P','P','P','P','B','P','P','P','P','P','P','B','P','P','P','P' ],
-                [ 'P','P','P','P','P','P','E','P','P','P','P','P','P','E','P','P' ],
+                [ 'P','P','P','P','P','P','E','P','P','P','P','P','E','P','P' ],
+                [ 'P','B','P','B','P','B','P','B','P','B','P','B','P','B','P' ],
+                [ 'E','P','P','P','P','P','P','B','P','B','P','B','P','B','P' ],
+                [ 'P','B','P','B','P','B','P','B','P','B','P','B','P','B','P' ],
+                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','P','P' ],
+                [ 'P','B','P','B','P','B','P','B','P','B','P','B','P','B','P' ],
+                [ 'P','P','P','P','P','P','P','B','B','B','P','B','P','B','P' ],
+                [ 'P','B','P','B','P','B','P','P','P','P','P','P','P','P','E' ],
+                [ 'E','P','P','P','P','P','P','B','B','P','P','P','P','B','P' ],
+                [ 'P','B','P','P','P','B','P','B','B','B','P','B','P','P','P' ],
+                [ 'P','B','B','P','B','B','P','B','B','B','P','B','P','B','P' ],
+                [ 'P','P','P','P','P','P','P','P','P','P','P','P','P','B','P' ],
+                [ 'P','B','B','P','B','P','P','P','B','P','P','B','P','P','E' ],
+                [ 'P','B','B','P','B','B','B','B','B','P','B','B','B','P','P' ],
+                [ 'P','P','P','E','P','P','P','P','P','E','P','P','P','P','P' ],
             ];
+            var numRows = map.length-1;
+            var numCols = map[0].length-1;
             var map_buildings = [];
             var map_paths = [];
 
@@ -166,12 +182,112 @@
                         if(block=='B') map_buildings.push({row: row_i, col: col_i, block_id: block_id});
                         if(block=='P') map_paths.push({row: row_i, col: col_i, block_id: block_id});
 
+                        if(row_i==0 || row_i==numRows || col_i==0 || col_i==numCols) block+=' safe';
+
                         map_html += '<div class="block block_'+block+'" id="'+block_id+'" row="'+row_i+'" col="'+col_i+'" />';
                     });
                     map_html += '</div>';
                 });
                 $('#server_view').html(map_html);
                 $('#player_view').html(map_html).attr('stage', 'choose_entrance');
+            }
+
+
+            function moveToBlock(){
+                if(gameOver) return;
+
+                var block = $(this);
+                if(!block.hasClass('clickable')){
+                    alert('Not a clickable block!');
+                    return false;
+                }
+                if(block.hasClass('guardFlag')) return;
+
+                var server_block = $('#server_view #'+block.attr('id'));
+                if(server_block.hasClass('guard')){
+                    alert('Game Over!');
+                    gameOver = true;
+                    $('#server_view').removeClass('invisible');
+                    return false;
+                }
+                if(server_block.hasClass('destination')){
+                    alert('You Win!');
+                    gameOver = true;
+                    $('#server_view').removeClass('invisible');
+                    return false;
+                }
+
+                $('.current_location').removeClass('current_location');
+                block.addClass('current_location').addClass('safe');
+                $('#server_view #'+block.attr('id')).addClass('current_location');
+                setClickables();
+                setHint();
+
+            }
+            $('#player_view').on('click', '.clickable', moveToBlock);
+
+
+            function setClickables(){
+                if(gameOver) return;
+
+                var currentBlock = $('.current_location');
+                $('#player_view .block').removeClass('clickable');
+                var row = parseInt(currentBlock.attr('row'));
+                var col = parseInt(currentBlock.attr('col'));
+                var rows = [row-1, row, row+1];
+                var cols = [col-1, col, col+1];
+                rows.forEach(function(row_i){
+                    cols.forEach(function(col_i){
+                        if(row==row_i && col==col_i) return;
+                        $('#player_view #block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
+
+                        /* not sure if it's a good rule
+                        if(currentBlock.hasClass('block_B')){
+                            $('#player_view #block_'+row_i+'_'+col_i+':not(.opened, .block_B)').addClass('clickable');
+                        } else {
+                            $('#player_view #block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
+                        }
+                        */
+                    });
+                });
+            }
+
+
+            function setHint(){
+                if(gameOver) return;
+
+                var surroundingGuards = $('#server_view .current_location').attr('surroundingGuards');
+                var block = $('#player_view .current_location');
+                block.attr('surroundingGuards', surroundingGuards);
+
+                if(surroundingGuards>0){
+                    var row = parseInt(block.attr('row'));
+                    var col = parseInt(block.attr('col'));
+                    var rows = [row-1, row, row+1];
+                    var cols = [col-1, col, col+1];
+
+                    rows.forEach(function(row_i){
+                        cols.forEach(function(col_i){
+                            var checkBlock = $('#player_view #block_'+row_i+'_'+col_i+':not(.block_B)');
+                            if(!checkBlock.hasClass('safe') && checkBlock.attr('surroundingGuards')!='0')
+                                checkBlock.attr('surroundingGuards', '?');
+                        });
+                    });
+                } else {
+                    var row = parseInt(block.attr('row'));
+                    var col = parseInt(block.attr('col'));
+                    var rows = [row-1, row, row+1];
+                    var cols = [col-1, col, col+1];
+
+                    rows.forEach(function(row_i){
+                        cols.forEach(function(col_i){
+                            var surroundingBlock = $('#player_view #block_'+row_i+'_'+col_i);
+                            surroundingBlock.addClass('safe');
+                            if(surroundingBlock.attr('surroundingGuards')=='?')
+                                surroundingBlock.attr('surroundingGuards','');
+                        });
+                    });
+                }
             }
 
 
@@ -184,28 +300,50 @@
                     alert('Not an entrance block!');
                     return false;
                 }
-                block.addClass('chosen_entrance').addClass('current_location');
+                block.addClass('chosen_entrance').addClass('current_location').addClass('safe');
                 $('#server_view #'+block.attr('id')).addClass('chosen_entrance').addClass('current_location');
                 setupBoard();
             }
             $('#player_view').on('click', '.block_E', chooseEntrance);
 
 
-            function setClickables(){
+            function setupBoard(){
                 if(gameOver) return;
 
-                $('#player_view .block').removeClass('clickable');
-                var row = parseInt($('.current_location').attr('row'));
-                var col = parseInt($('.current_location').attr('col'));
-                var rows = [row-1, row, row+1];
-                var cols = [col-1, col, col+1];
-                rows.forEach(function(row_i){
-                    cols.forEach(function(col_i){
-                        if(row==row_i && col==col_i) return;
 
-                        $('#player_view #block_'+row_i+'_'+col_i+':not(.opened)').addClass('clickable');
-                    });
+                // set destination
+
+                var minRow = Math.round(numRows/3);
+                var maxRow = minRow*2;
+                var minCol = Math.round(numCols/3);
+                var maxCol = minCol*2;
+                var possibleDestinationBlocks = [];
+                $('#player_view .block_B').each(function(){
+                    var block = $(this);
+                    var row = parseInt(block.attr('row'));
+                    var col = parseInt(block.attr('col'));
+                    if(row >= minRow && row <= maxRow && col >= minCol && col <= maxCol)
+                        possibleDestinationBlocks.push(block.attr('id'));
                 });
+                var destination_id = possibleDestinationBlocks[ Math.floor(Math.random()*possibleDestinationBlocks.length) ];
+                $('#server_view #'+destination_id+', #player_view #'+destination_id).addClass('destination');
+
+
+                // add guards
+
+                var difficulty = 5;
+                var guards = ( numRows+numCols ) * ( 1+( difficulty/10 ) );
+
+                var possibleGuardedBlocks = $('#server_view .block_P:not([row="0"], [row="'+numRows+'"], [col="0"], [col="'+numCols+'"])');
+                possibleGuardedBlocks = shuffleArray(possibleGuardedBlocks);
+                var guardedBlocks = $(possibleGuardedBlocks.splice(0,guards));
+
+                guardedBlocks.addClass('guard');
+
+                setServerHints();
+                setClickables();
+                setHint();
+                $('#player_view').attr('stage', 'next_step');
             }
 
 
@@ -226,79 +364,19 @@
                         });
                     });
 
-                    if(surroundingGuards>0) block.attr('surroundingGuards', surroundingGuards);
+                    block.attr('surroundingGuards', surroundingGuards);
                 });
-
             }
 
 
-            function setupBoard(){
+            function toggleGuardFlag(e){
                 if(gameOver) return;
+                if($('#player_view[stage="next_step"]').length==0) return;
 
-                // set destination
-                var numRows = map.length-1;
-                var numCols = map[0].length-1;
-                var possibleDestinationBlocks = $('#player_view .block_B:not([row="0"], [row="'+numRows+'"], [col="0"], [col="'+numCols+'"])');
-                var destination = possibleDestinationBlocks.eq( Math.floor(Math.random()*possibleDestinationBlocks.length) );
-                destination.addClass('destination');
-                $('#server_view #'+destination.attr('id')).addClass('destination');
-
-                // add guards
-                var difficulty = 5;
-                var guards = ( numRows+numCols ) * ( 1+( difficulty/10 ) );
-
-                var possibleGuardedBlocks = $('#server_view .block_P:not([row="0"], [row="'+numRows+'"], [col="0"], [col="'+numCols+'"])');
-                possibleGuardedBlocks = shuffleArray(possibleGuardedBlocks);
-                var guardedBlocks = $(possibleGuardedBlocks.splice(0,guards));
-
-                guardedBlocks.addClass('guard');
-
-                setServerHints();
-                setHint();
-
-                setClickables();
-                $('#player_view').attr('stage', 'next_step');
+                e.preventDefault();
+                $(this).toggleClass('guardFlag');
             }
-
-
-            function moveToBlock(){
-                if(gameOver) return;
-
-                var block = $(this);
-                if(!block.hasClass('clickable')){
-                    alert('Not a clickable block!');
-                    return false;
-                }
-                var server_block = $('#server_view #'+block.attr('id'));
-                if(server_block.hasClass('guard')){
-                    alert('Game Over!');
-                    gameOver = true;
-                    $('#server_view').removeClass('invisible');
-                    return false;
-                }
-                if(server_block.hasClass('destination')){
-                    alert('You Win!');
-                    gameOver = true;
-                    $('#server_view').removeClass('invisible');
-                    return false;
-                }
-
-                $('.current_location').removeClass('current_location');
-                block.addClass('current_location').addClass('visited');
-                $('#server_view #'+block.attr('id')).addClass('current_location');
-                setClickables();
-                setHint();
-
-            }
-            $('#player_view').on('click', '.clickable', moveToBlock);
-
-
-            function setHint(){
-                if(gameOver) return;
-
-                var surroundingGuards = $('#server_view .current_location').attr('surroundingGuards');
-                if(surroundingGuards) $('#player_view .current_location').attr('surroundingGuards', surroundingGuards);
-            }
+            $('#player_view').on('contextmenu', '.block', toggleGuardFlag);
 
 
             function shuffleArray(array) {

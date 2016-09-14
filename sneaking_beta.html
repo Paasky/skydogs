@@ -172,18 +172,16 @@
 
                 // set destination
                 var destination = map_buildings[ Math.floor(Math.random()*map_buildings.length) ];
-                var block = $('#player_view #'+destination.block_id);
+                var block = $('#player_view #'+destination.block_id+', #server_view #'+destination.block_id);
                 block.addClass('destination');
 
                 // add guards
-                var plots = map_buildings.concat(map_paths);
+                var plots = $('#server_view .block_P, #server_view .block_B:not(.destination)');
                 plots = shuffleArray(plots);
                 var guards = 10;
-                var guardedPlots = plots.splice(0,guards);
+                var guardedPlots = $(plots.splice(0,guards));
 
-                guardedPlots.forEach(function(plot){
-                    $('#server_view #'+plot.block_id).addClass('guard');
-                });
+                guardedPlots.addClass('guard');
 
 
 
